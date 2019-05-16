@@ -107,10 +107,10 @@ export const paymentDispatcher = new QueueDispatcher(
               );
               const proof = await service.bcc.payments.incrementBalanceAndSign(eveToSend);
 
-              // // send proof to agent
-              // await service.paymentService.requestPaymentAgent(
-              //   `confirmChannel?proof=${proof.sig}&openBlockNumber=${createdChannel.block}`
-              // );
+              // send proof to agent
+              await service.paymentService.requestPaymentAgent(
+                `channel/confirm?proof=${proof.sig}&openBlockNumber=${createdChannel.block}`
+              );
               break;
             }
             // charge an channel using an specific amount of eve
@@ -127,12 +127,12 @@ export const paymentDispatcher = new QueueDispatcher(
               // transform eve value to gwei
               const eveToSend = service.bcc.web3.utils.toWei(entry.eve, 'ether');
               await service.bcc.payments.topUpChannel(eveToSend);
-              // const eveBn = service.bcc.payments.toBigNumber(eveToSend).plus(channel.deposit);
-              // const proof = await service.bcc.payments.incrementBalanceAndSign(eveBn);
-              // // send proof to agent
-              // await service.paymentService.requestPaymentAgent(
-              //   `confirmChannel?proof=${proof.sig}&openBlockNumber=${channel.openBlockNumber}`
-              // );
+              const eveBn = service.bcc.payments.toBigNumber(eveToSend).plus(channel.deposit);
+              const proof = await service.bcc.payments.incrementBalanceAndSign(eveBn);
+              // send proof to agent
+              await service.paymentService.requestPaymentAgent(
+                `channel/confirm?proof=${proof.sig}&openBlockNumber=${channel.openBlockNumber}`
+              );
               break;
             }
             // unpin an ipfs hash
