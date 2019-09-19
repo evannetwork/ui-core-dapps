@@ -27,25 +27,28 @@
 // import evan libs
 import {
   DAppLoaderComponent,
-  RouteRegistrationInterface
+  RouteRegistrationInterface,
+  UnderDevelopmentComponent,
 } from '@evan.network/ui-vue-core';
 
 import * as dappBrowser from '@evan.network/ui-dapp-browser';
 
-import ProfileDetailComponent from './components/detail/detail.vue';
+import ProfileDetailComponent from './components/profile/profile.vue';
 import ProfileSettingsComponent from './components/settings/settings.vue';
+import VerificationsComponent from './components/verifications/overview/overview.vue';
 
 // map them to element names, so they can be used within templates
 const routeRegistration: Array<RouteRegistrationInterface> = [
   { path: '', redirect: { path: 'detail' } },
-  { name: 'detail', path: 'detail', component: ProfileDetailComponent },
+  { name: 'detail', path: 'detail/:address?', component: ProfileDetailComponent },
   { name: 'settings', path: 'settings', component: ProfileSettingsComponent },
+  { name: 'wallet', path: 'wallet', component: UnderDevelopmentComponent },
+  { name: 'verifications', path: 'verifications/:address?', component: VerificationsComponent, },
   {
-    name: 'organizations',
+    name: 'addressbook.vue',
     component: DAppLoaderComponent,
-    path: `organizations.${ dappBrowser.getDomainName() }/**`,
+    path: `addressbook.vue.${ dappBrowser.getDomainName() }/**`,
   },
-
 ];
 
 export default routeRegistration;

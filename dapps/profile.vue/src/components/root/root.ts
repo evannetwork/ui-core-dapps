@@ -38,19 +38,35 @@ import * as dappBrowser from '@evan.network/ui-dapp-browser';
 @Component({ })
 export default class ProfileRootComponent extends mixins(EvanComponent) {
   /**
-   * Tabs for top navigation
+   * navEntries for top navigation
    */
-  tabs: Array<any> = [ ];
+  navEntries: Array<any> = [ ];
 
   /**
    * Setup navigation structure
    */
-  created() {
-    this.tabs = [ 'detail', 'settings', 'organizations.evan' ]
-      .map(urlKey => ({
-        id: `tab-${ urlKey }`,
-        href: `${ (<any>this).dapp.fullUrl }/${ urlKey }`,
-        text: `_profile.breadcrumbs.${ urlKey }`
-      }));
+  setNavEntries() {
+    const address = this.$route.params.address;
+    const baseUrl = `${ (<any>this).dapp.fullUrl }${ address ? '/' + address : '' }`;
+    const runtime = (<any>this).getRuntime();
+
+    // is currently my profile opened?
+    this.$store.state.isMyProfile = !this.$route.params.address ||
+      this.$route.params.address === this.$store.state.runtime.activeAccount;
+
+    this.navEntries = [
+      { key: 'detail', icon: 'mdi mdi-account-outline' },
+      { key: 'wallet', icon: 'mdi mdi-wallet-outline' },
+      { key: `verifications`, icon: 'mdi mdi-check-decagram' },
+      { key: `addressbook.vue.${ (<any>this).dapp.domainName }`, icon: 'mdi mdi-account-group-outline' },
+      null,
+      { key: 'settings', icon: 'mdi mdi-settings' },
+    ]
+    .map(entry => (entry ? {
+      id: `nav-entry-${ entry.key }`,
+      href: `${ baseUrl }/${ entry.key }`,
+      text: `_profile.breadcrumbs.${ entry.key.split('/')[0] }`,
+      icon: entry.icon,
+    } : null));
   }
 }

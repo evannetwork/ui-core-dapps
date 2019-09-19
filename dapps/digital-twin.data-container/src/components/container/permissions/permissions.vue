@@ -104,7 +104,7 @@
                   <td style="height: 70px">
                     <button class="btn btn-primary btn-sm btn-circle"
                       @click="$refs.addUserModal.show();">
-                      <i class="mdi mdi-plus" style="width: 16px;"></i>
+                      <i class="mdi mdi-plus"></i>
                     </button>
                   </td>
                   <td style="height: 70px"
@@ -120,7 +120,7 @@
 
         <div class="w-100 text-right mt-3"
           v-if="isOwner">
-          <button class="btn btn-primary btn-rounded font-weight-normal mt-3"
+          <button class="btn btn-primary font-weight-normal mt-3"
             :disabled="!permissionChanged || sharing"
             @click="$refs.shareModal.show()">
             {{ `_datacontainer.share.share` | translate }}
@@ -160,7 +160,7 @@
             </div>
           </template>
           <template v-slot:footer>
-            <button type="button" class="btn btn-primary btn-rounded font-weight-normal"
+            <button type="button" class="btn btn-primary font-weight-normal"
               id="container-share"
               @click="addUser()">
               {{ `_datacontainer.share.add-user` | translate }}
@@ -183,7 +183,7 @@
             </p>
           </template>
           <template v-slot:footer>
-            <button type="button" class="btn btn-primary btn-rounded font-weight-normal"
+            <button type="button" class="btn btn-primary font-weight-normal"
               id="container-go-addressbook"
               @click="evanNavigate(`addressbook.vue.${ dapp.domainName }`, `/${ dapp.rootEns }`)">
               {{ `_datacontainer.share.no-contacts.open-contacts` | translate }}
@@ -237,7 +237,7 @@
             </div>
           </template>
           <template v-slot:footer>
-            <button type="button" class="btn btn-primary btn-rounded font-weight-normal"
+            <button type="button" class="btn btn-primary font-weight-normal"
               id="plugin-share"
               :disabled="!shareForm.isValid"
               @click="share()">

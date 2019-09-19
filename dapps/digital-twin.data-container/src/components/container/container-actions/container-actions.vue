@@ -30,7 +30,7 @@
   <div
     :style="displayMode === 'buttons' ? 'margin-right: -1em' : ''">
     <!-- show dropdown button  -->
-    <button class="btn btn-circle btn-sm btn-tertiary"
+    <button class="btn btn-icon"
       v-if="displayMode === 'dropdownButton'"
       id="datacontainer-context-menu-open"
       @click="showDropdown($event)">
@@ -69,7 +69,7 @@
                 <div class="spinner-border spinner-border-sm"
                   v-if="saving">
                 </div>
-                <i class="mdi mdi-pencil" style="width: 16px;" v-else></i>
+                <i class="mdi mdi-pencil" v-else></i>
                 <component :is="buttonTextComp" :placement="'bottom'">
                   {{ `_datacontainer.edit-dbcp` | translate }}
                 </component>
@@ -81,7 +81,7 @@
                 <div class="spinner-border spinner-border-sm"
                   v-if="sharing">
                 </div>
-                <i class="mdi mdi-share-variant" style="width: 16px;" v-else></i>
+                <i class="mdi mdi-share-variant" v-else></i>
                 <component :is="buttonTextComp" :placement="'bottom'">
                   {{ `_datacontainer.context-menu.share` | translate }}
                 </component>
@@ -89,7 +89,7 @@
               <button :class="buttonClasses.tertiar"
                 id="container-container-link"
                 @click="reactiveRefs.dtContainerLink.$refs.containerLinkModal.show(); closeDropdown();">
-                <i class="mdi mdi-link-variant" style="width: 16px;"></i>
+                <i class="mdi mdi-link-variant"></i>
                 <component :is="buttonTextComp" :placement="'bottom'">
                   {{ `_datacontainer.context-menu.link` | translate }}
                 </component>
@@ -97,7 +97,7 @@
               <a :class="buttonClasses.tertiar"
                 id="container-clone"
                 @click="reactiveRefs.dcClone.showModal(); closeDropdown();">
-                <i class="mdi mdi-content-copy" style="width: 16px;"></i>
+                <i class="mdi mdi-content-copy"></i>
                 <component :is="buttonTextComp" :placement="'bottom'">
                   {{ `_datacontainer.context-menu.clone` | translate }}
                 </component>
@@ -105,7 +105,7 @@
               <a :class="buttonClasses.tertiar"
                 id="container-plugin-create"
                 @click="reactiveRefs.saveAsPlugin.showModal(); closeDropdown();">
-                <i class="mdi mdi-content-duplicate" style="width: 16px;"></i>
+                <i class="mdi mdi-content-duplicate"></i>
                 <component :is="buttonTextComp" :placement="'bottom'">
                   {{ `_datacontainer.context-menu.plugin-save` | translate }}
                 </component>
@@ -148,7 +148,7 @@
         <template v-slot:footer>
           <button type="submit"
             id="container-dbcp-save"
-            class="btn btn-rounded btn-primary"
+            class="btn  btn-primary"
             v-if="reactiveRefs.dbcpForm"
             :disabled="saving || !reactiveRefs.dbcpForm.isValid"
             @click="saveDbcp()">
