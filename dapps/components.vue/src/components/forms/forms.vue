@@ -86,7 +86,7 @@
           id="evan-form-test-4"
           label="Field 4 - Select"
           type="number"
-          v-model="field4"
+          v-model="select"
           :options="options"
           :stacked="stacked"
         />
@@ -106,13 +106,14 @@
           </div>
         </div>
 
-        <div class="form-group"
-          :class="{ 'inline': stacked }">
-          <label class="col-form-label" for="select-input">
-            Select Input
-          </label>
-          <evan-v-select id="select-input" label="alias" :options="contacts" :disabled="contacts.length === 0"/>
-        </div>
+        <evan-form-control-v-select
+          id="evan-form-test-5"
+          label="Field 5 - V-Select"
+          v-model="field5"
+          :options="contacts"
+          :disabled="contacts.length === 0"
+          :taggable="true"
+        />
 
       </evan-form>
     </template>

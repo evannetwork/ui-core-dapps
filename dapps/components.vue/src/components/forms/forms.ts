@@ -57,6 +57,7 @@ export default class Forms extends mixins(EvanComponent) {
   field2 = 'a';
   field3 = 0;
   field4 = 0;
+  field5 = null;
 
   options = [
     {label: 'Option 1', value: 'option1'},
@@ -153,8 +154,8 @@ export default class Forms extends mixins(EvanComponent) {
 
     this.contacts = Object.keys(addressBook).map(key => {
       return {
-        'hash': key,
-        'alias': addressBook[key].alias
+        'label': addressBook[key].alias,
+        'value': key
       }
     })
   }
