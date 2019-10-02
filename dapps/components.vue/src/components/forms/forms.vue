@@ -100,7 +100,7 @@
             <input type="checkbox"
               id="custom-input"
               class="form-control"
-              @focus="$refs.sampleForm2.setEditMode(true)"
+              @change="$refs.sampleForm2.setEditMode(true)"
               v-model="isPublic"
             />
           </div>
