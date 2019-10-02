@@ -86,7 +86,7 @@
           id="evan-form-test-4"
           label="Field 4 - Select"
           type="number"
-          v-model="select"
+          v-model="field4"
           :options="options"
           :stacked="stacked"
         />
