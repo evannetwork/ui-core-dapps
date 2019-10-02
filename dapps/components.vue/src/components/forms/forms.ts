@@ -79,8 +79,8 @@ export default class Forms extends mixins(EvanComponent) {
    */
   dispatcherWatch = null;
 
-  created() {
-    this.loadAddressBook()
+  async created() {
+    await this.loadAddressBook()
 
     this.sampleForm = new EvanForm(this, {
       field1: {
