@@ -121,6 +121,19 @@ export default class Forms extends mixins(EvanComponent) {
           }
         }
       },
+      vSelect: {
+        value: '',
+        validate: function(vueInstance: Forms, form: SampleFormInterface) {
+          return this.value.length !== 0;
+        },
+        uiSpecs: {
+          type: 'v-select',
+          attr: {
+           options: this.contacts,
+           taggable: true
+          }
+        }
+      },
       files: {
         value: [ ],
         validate: function(vueInstance: Forms, form: SampleFormInterface) {
