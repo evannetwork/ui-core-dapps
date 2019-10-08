@@ -15,14 +15,6 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 
 // vue imports
@@ -103,6 +95,9 @@ export default class Mnemonic extends mixins(EvanComponent) {
   // is currently a riddle started?
   riddelStarted = false;
 
+  // any mnemonic word has been modified
+  anyWordDirty = false;
+
   created () {
     // check the initial mode
     this.useTextArea = this.$props.mode === 'textarea';
@@ -155,7 +150,7 @@ export default class Mnemonic extends mixins(EvanComponent) {
   }
 
   async getFilteredMnemonicWords(index) {
-    if (this.words[index].length < 2) {
+    if (!this.words[index] || this.words[index].length < 2) {
       return [ ];
     } else {
       const lowerCase = this.words[index].toLowerCase();
@@ -203,24 +198,6 @@ export default class Mnemonic extends mixins(EvanComponent) {
   }
 
   /**
-   * Takes changes of the textarea and updates the words array and the validity checks.
-   */
-  textAreaChanged(isEnter) {
-    // set current values
-    this.words = this.mnemonicText.split(' ');
-    this.fillEmptyWords(this.words);
-    this.checkCorrectWords([ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ]);
-
-    // update the original value
-    this.updateParent();
-
-    // when enter key was pressed, send submit event to parent
-    if (isEnter) {
-      this.onSubmit();
-    }
-  }
-
-  /**
    * Send submit event to parent if all words are correct.
    */
   onSubmit() {
@@ -240,6 +217,7 @@ export default class Mnemonic extends mixins(EvanComponent) {
     // check current words
     this.checkCorrectWords([ index ]);
     this.mnemonicText = this.words.join(' ').replace(/\s+$/, '');
+    this.anyWordDirty = true;
 
     // update the original value
     this.updateParent();
@@ -253,7 +231,7 @@ export default class Mnemonic extends mixins(EvanComponent) {
   checkCorrectWords(indexes) {
     indexes.forEach(index => {
       // if the word has only 1 character, don't show the preview
-      if (this.words[index].length < 2) {
+      if (this.words[index] && this.words[index].length < 2) {
         this.correctWords[index] = false;
       // if a riddle is started (a initial value is available) and the same word was entered,
       // its correct if no riddle is start, check if the word exists within the lightwallet
@@ -329,19 +307,26 @@ export default class Mnemonic extends mixins(EvanComponent) {
     e.stopPropagation();
     e.preventDefault();
 
-    // Get pasted data via clipboard API
+    // Get pasted data via clipboard API and perform basic cleanup steps
     const clipboardData = e.clipboardData || (window as any).clipboardData;
-    const pastedData = clipboardData.getData('Text');
+    const pastedData = clipboardData
+      .getData('Text')
+      .toLowerCase()
+      .replace(/[^a-z ]/g, '')
+      .replace(/ {2,}/g, ' ')
+      .trim()
+    ;
 
     // split mnemonic
     if (pastedData) {
-      const splittedData = pastedData.split(' ');
-      if (splittedData.length === 12) {
-        this.words = ([ ] as Array<string>).concat(splittedData);
+      const splitData = pastedData.split(' ');
+      if (splitData.length <= 12) {
+        // add empty strings for fields at the end of the array
+        this.words = splitData.concat([...Array(12 - splitData.length)].map(() => ''));
+        this.mnemonicText = this.words.join(' ').replace(/\s+$/, '');
 
         // update the original value
         this.checkCorrectWords([ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ]);
-        this.mnemonicText = this.words.join(' ').replace(/\s+$/, '');
         this.updateParent();
       }
     }
@@ -354,7 +339,6 @@ export default class Mnemonic extends mixins(EvanComponent) {
     this.words = this.initial;
     this.mnemonicText = this.initial.join(' ');
     this.riddelStarted = false;
-    this.textAreaChanged(false);
   }
 
   setDirty(index) {

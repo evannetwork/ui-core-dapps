@@ -15,18 +15,15 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 
 import de from './de';
 import en from './en';
+import * as countries from '@evan.network/ui-countries';
+import { translations } from '@evan.network/ui-countries';
 
 // map all langugages
-export default { de, en };
+export default {
+  de: { ...de, ...translations.de },
+  en: { ...en, ...translations.en },
+};

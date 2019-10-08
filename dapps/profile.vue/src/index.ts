@@ -15,18 +15,11 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 
 import Vue from 'vue';
-import { initializeVue } from '@evan.network/ui-vue-core';
+import { initializeVue, getDomainName, } from '@evan.network/ui-vue-core';
+import * as dappBrowser from '@evan.network/ui-dapp-browser';
 
 import Main from './components/root/root.vue';
 import translations from './i18n/translations';
@@ -47,6 +40,12 @@ export { translations }
  * @param      {string}  dappBaseUrl  origin of the dapp
  */
 export async function startDApp(container: any, dbcpName: any, dappEnsOrContract: any, dappBaseUrl: any) {
+  // load the vue evan core to get its origin and access the images
+  const profileDbcp = await dappBrowser.System
+    .import(`profile.vue.${ getDomainName() }!ens`);
+  const profileBaseUrl = dappBrowser.dapp.getDAppBaseUrl(profileDbcp,
+    `${ profileDbcp.name }.${ getDomainName() }`);
+
   await initializeVue({
     components,
     container,
@@ -55,7 +54,7 @@ export async function startDApp(container: any, dbcpName: any, dappEnsOrContract
     dbcpName,
     RootComponent: Main,
     routes,
-    state: { },
+    state: { profileBaseUrl, },
     translations: translations,
     Vue: Vue,
   });

@@ -15,14 +15,6 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 
 // vue imports
@@ -102,7 +94,7 @@ export default class SignUp extends mixins(EvanComponent) {
   async created() {
     this.profileForm = (<ProfileFormInterface>new EvanForm(this, {
       accountType: {
-        value: 'Unspecified',
+        value: 'unspecified',
       },
       alias: {
         value: '',
@@ -336,12 +328,18 @@ export default class SignUp extends mixins(EvanComponent) {
 
           // trigger smart agent to create the profile
           try {
-            await axios.post(`${ baseUrlFaucet }handout?apiVersion=1`, {
+            const handoutPayload: any = {
               accountId: accountId,
               signature: signature,
               profileInfo: fileHashes,
-              captchaToken: this.recaptchaToken
-            });
+            };
+
+            // if no evan-test-mode is enable, ask for valid captchaToken
+            if (!window.localStorage['evan-test-mode']) {
+              handoutPayload.captchaToken = this.recaptchaToken;
+            }
+
+            await axios.post(`${ baseUrlFaucet }handout?apiVersion=1`, handoutPayload);
 
             if (!rejected) {
               resolve();

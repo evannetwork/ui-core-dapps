@@ -15,14 +15,6 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 
 // vue imports
@@ -32,6 +24,9 @@ import { Prop, Watch } from 'vue-property-decorator';
 
 // evan.network imports
 import { EvanComponent, EvanForm, EvanFormControl } from '@evan.network/ui-vue-core';
+import * as bcc from '@evan.network/api-blockchain-core';
+import { Dispatcher, DispatcherInstance } from '@evan.network/ui';
+import * as dispatchers from '../../dispatchers/registry';
 
 interface SampleFormInterface extends EvanForm {
   field1: string;
@@ -55,22 +50,38 @@ export default class Forms extends mixins(EvanComponent) {
    */
   showForms = true;
 
-  wurstAmount1 = ''
-  wurstAmount2 = 'a'
-  wurstAmount3 = 0
-  wurstAmount4 = 0
+  /**
+   * Custom field value handling
+   */
+  field1 = '';
+  field2 = 'a';
+  field3 = 0;
+  field4 = 0;
+  field5 = null;
 
   options = [
-    {label: 'Bockwurst', value: 'bocki'},
-    {label: 'Knacker', value: 'knacki'},
-    'Wienerwurst',
-    'Mett',
-    'Hanns Wurst'
+    {label: 'Option 1', value: 'option1'},
+    {label: 'Option 2', value: 'option2'},
+    'Option 3',
+    'Option 4',
+    'Option 5'
   ]
 
   sampleForm: SampleFormInterface = null;
 
-  created() {
+  /**
+   * Mapped Object from original addressbook
+   */
+  contacts: any = [];
+
+  /**
+   * Watch for dispatcher updates.
+   */
+  dispatcherWatch = null;
+
+  async created() {
+    await this.loadAddressBook()
+
     this.sampleForm = new EvanForm(this, {
       field1: {
         value: '',
@@ -110,6 +121,19 @@ export default class Forms extends mixins(EvanComponent) {
           }
         }
       },
+      vSelect: {
+        value: '',
+        validate: function(vueInstance: Forms, form: SampleFormInterface) {
+          return this.value.length !== 0;
+        },
+        uiSpecs: {
+          type: 'v-select',
+          attr: {
+           options: this.contacts,
+           taggable: true
+          }
+        }
+      },
       files: {
         value: [ ],
         validate: function(vueInstance: Forms, form: SampleFormInterface) {
@@ -128,6 +152,24 @@ export default class Forms extends mixins(EvanComponent) {
 
         resolve('saved')
       }, 1000)
+    })
+  }
+
+  /**
+   * load the addressbook for the current user
+   */
+  async loadAddressBook() {
+    const runtime = (<any>this).getRuntime();
+
+    // load the contacts for the current user, so we can display correct contact alias
+    delete runtime.profile.trees[runtime.profile.treeLabels.addressBook];
+    let addressBook = (await runtime.profile.getAddressBook()).profile;
+
+    this.contacts = Object.keys(addressBook).map(key => {
+      return {
+        'label': addressBook[key].alias,
+        'value': key
+      }
     })
   }
 }

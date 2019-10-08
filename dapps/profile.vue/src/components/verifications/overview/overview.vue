@@ -15,14 +15,6 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 
 <template>
@@ -46,7 +38,7 @@
           :address="address"
           ref="orgIdentIssue">
         </notary-action-issue>
-        <button type="button" class="btn btn-primary "
+        <button type="button" class="btn btn-primary"
           id="ident-request"
           @click="$refs.orgIdentIssue.show()">
           {{ `_profile.verifications.notary.issue.issue` | translate }}
@@ -56,13 +48,21 @@
     </div>
     <div class="w-100 mt-5 d-flex flex-wrap flex-row"
       v-if="!rerender">
-      <notary-verification :address="address"></notary-verification>
+      <evan-loading v-if="loading"></evan-loading>
+      <template v-else>
+        <div class="text-center mt-5" v-if="type !== 'company'">
+          <h5>{{ '_profile.type.no-verifications-avaiable' | translate }}</h5>
+        </div>
+        <template v-else-if="type === 'company'">
+          <notary-verification :address="address"></notary-verification>
+        </template>
+      </template>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import Component from './overview.ts';
+  import Component from './overview';
   export default Component;
 </script>
 

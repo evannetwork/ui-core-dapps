@@ -15,19 +15,12 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 
 import VueRecaptcha from 'vue-recaptcha';
 import MnemonicComponent from './mnemonic/mnemonic.vue';
 import AcceptContactComponent from './accept-contact/accept-contact.vue';
+import LayoutWrapperComponent from './layout-wrapper/layout-wrapper.vue';
 
 // import evan libs
 import { ComponentRegistrationInterface } from '@evan.network/ui-vue-core';
@@ -42,6 +35,7 @@ export {
 // map them to element names, so they can be used within templates
 const componentRegistration: Array<ComponentRegistrationInterface> = [
   { name: 'evan-onboarding-accept-contact', component: AcceptContactComponent },
+  { name: 'evan-onboarding-layout-wrapper', component: LayoutWrapperComponent },
   { name: 'evan-onboarding-mnemonic', component: MnemonicComponent },
   { name: 'vue-recaptcha', component: VueRecaptcha },
 ];

@@ -15,14 +15,6 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 // import evan libs
 import {
@@ -41,8 +33,8 @@ import VerificationsComponent from './components/verifications/overview/overview
 const routeRegistration: Array<RouteRegistrationInterface> = [
   { path: '', redirect: { path: 'detail' } },
   { name: 'detail', path: 'detail/:address?', component: ProfileDetailComponent },
-  { name: 'settings', path: 'settings', component: ProfileSettingsComponent },
-  { name: 'wallet', path: 'wallet', component: UnderDevelopmentComponent },
+  { name: 'settings', path: 'settings/:address?', component: ProfileSettingsComponent },
+  { name: 'wallet', path: 'wallet/:address?', component: UnderDevelopmentComponent },
   { name: 'verifications', path: 'verifications/:address?', component: VerificationsComponent, },
   {
     name: 'addressbook.vue',

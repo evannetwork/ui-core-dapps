@@ -12,17 +12,11 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 -->
 
 <evan-loading *ngIf="loading" delayLoading="500"></evan-loading>
 
-<div *ngIf="!loading">
+<div *ngIf="!loading" class="buy-eve">
   <div class="evan-relative evan-content">
     <h3 class="content-header m-b-0 m-t-0">
       {{ '_dappprofile.buy-eve.buy-eve' | translate }}
@@ -301,7 +295,7 @@
           <div *ngIf="!vatError && payEve.amount >= 10" text-center padding-top>
             <h1>{{ ((payEve.amount || 0) * (1 + tax / 100)).toFixed(2) }} €</h1>
           </div>
-          <div *ngIf="!vatError && payEve.amount >= 10" text-center padding-top>
+          <div *ngIf="!vatError && payEve.amount >= 10  && tax" text-center padding-top>
             <h5>{{ '_dappprofile.pay-eve.incl' | translate }} {{ (tax)}} % {{ '_dappprofile.pay-eve.vatPercent' | translate }}</h5>
           </div>
           <div *ngIf="!vatError && payEve.amount >= 10" text-center padding-top>
@@ -312,6 +306,9 @@
               <span color="light">{{ '_dappprofile.pay-eve.pay' | translate }}</span>
             </button>
             <p *ngIf="paymentRunning">{{'_dappprofile.pay-eve.processing-hint' | translate}}...</p>
+          </div>
+          <div *ngIf="!vatError && payEve.amount >= 10 && !tax" text-center padding-top>
+            <p [innerHTML]="'_dappprofile.pay-eve.reverse-charge' | translate"></p>
           </div>
           <div [hidden]="activePaymentTab === 0">
             <p class="text-justify">

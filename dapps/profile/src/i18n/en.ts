@@ -15,14 +15,6 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 
 export const en = {
@@ -193,7 +185,8 @@ export const en = {
       "successful-payment": "Your order was successfully placed. You will receive an invoice by email. <br> The process is completed as soon as you receive the invoice.<br />The amount will be credited in the next 5 to 10 minutes to your wallet.",
       "sepa-acceptance": "By providing your IBAN and confirming this payment, you are authorizing evan GmbH and Stripe, our payment service provider, to send instructions to your bank to debit your account and your bank to debit your account in accordance with those instructions. You are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.",
       "processing-hint": "Processing payment, this may take 3 to 5 minutes",
-      "review-sepa": "You can review the SEPA mandate here."
+      "review-sepa": "You can review the SEPA mandate here.",
+      "reverse-charge": "Reverse charge applies!<br>Please check for possibly arising tax liabilities in your country from this purchase."
     },
     "private-key": "Private Key",
     "privatekey-desc": "The private key of your account secures access to your blockchain identity.",

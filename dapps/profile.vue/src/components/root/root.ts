@@ -15,14 +15,6 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 
 // vue imports
@@ -47,7 +39,6 @@ export default class ProfileRootComponent extends mixins(EvanComponent) {
    */
   setNavEntries() {
     const address = this.$route.params.address;
-    const baseUrl = `${ (<any>this).dapp.fullUrl }${ address ? '/' + address : '' }`;
     const runtime = (<any>this).getRuntime();
 
     // is currently my profile opened?
@@ -64,7 +55,7 @@ export default class ProfileRootComponent extends mixins(EvanComponent) {
     ]
     .map(entry => (entry ? {
       id: `nav-entry-${ entry.key }`,
-      href: `${ baseUrl }/${ entry.key }`,
+      href: `${ (<any>this).dapp.fullUrl }/${ entry.key }${ address ? '/' + address : '' }`,
       text: `_profile.breadcrumbs.${ entry.key.split('/')[0] }`,
       icon: entry.icon,
     } : null));

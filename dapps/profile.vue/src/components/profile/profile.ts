@@ -15,14 +15,6 @@
   write to the Free Software Foundation, Inc., 51 Franklin Street,
   Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
   the following URL: https://evan.network/license/
-
-  You can be released from the requirements of the GNU Affero General Public
-  License by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts
-  of it on other blockchains than evan.network.
-
-  For more information, please contact evan GmbH at this address:
-  https://evan.network/license/
 */
 
 // vue imports
@@ -36,6 +28,7 @@ import * as bcc from '@evan.network/api-blockchain-core';
 import * as dappBrowser from '@evan.network/ui-dapp-browser';
 
 import { getIdentificationDetails } from '../verifications/notary/notary.lib';
+import * as dispatchers from '../../dispatchers/registry';
 
 @Component({ })
 export default class ProfileDetailComponent extends mixins(EvanComponent) {
@@ -49,14 +42,14 @@ export default class ProfileDetailComponent extends mixins(EvanComponent) {
    */
   address = '';
   /**
-   * Currents users type
+   * Currents users account information
    */
-  type = 'unspecified';
+  userInfo = null;
 
   /**
    * Currents users eve balances and the timestamp, when the balance was loaded
    */
-  balance: { amount: number, timestamp: number } = null;
+  balance: { amount: string, timestamp: number } = null;
 
   /**
    * Amount of calculated verifications and requests
@@ -71,11 +64,11 @@ export default class ProfileDetailComponent extends mixins(EvanComponent) {
     // fill empty address with current logged in user
     this.address = this.$route.params.address || runtime.activeAccount;
     // load balance and parse it to 3 decimal places
+    const amount = parseFloat((await dappBrowser.core.getBalance(runtime.activeAccount)).toFixed(3));
     this.balance = {
-      amount: (await dappBrowser.core.getBalance(runtime.activeAccount)).toFixed(3),
+      amount: amount.toLocaleString(this.$i18n.locale()),
       timestamp: Date.now(),
     };
-
     this.loading = false;
   }
 
@@ -89,5 +82,35 @@ export default class ProfileDetailComponent extends mixins(EvanComponent) {
       this.verificationCount += (<any>this.$refs.notaryVerifications).verifications.length;
       this.verificationCount += (<any>this.$refs.notaryVerifications).requests.length;
     }
+  }
+
+  /**
+   * Return the update dispatcher running state.
+   */
+  isLoading() {
+    return (this as any).$store.state.dispatcher.curr.running.updateProfileDispatcher;
+  }
+
+  /**
+   * Open the type switch modal
+   */
+  typeSwitchModal() {
+    if (this.userInfo.profileType === 'unspecified' && !this.isLoading()) {
+      (this as any).$refs.profileType.show();
+    }
+  }
+
+  /**
+   * Save changed user information
+   *
+   * @param      {any}  userInfo  latest user informatione
+   */
+  saveUserInfo(userInfo: any) {
+    this.userInfo = userInfo;
+
+    dispatchers.updateProfileDispatcher.start((<any>this).getRuntime(), {
+      formData: userInfo,
+      type: 'accountDetails'
+    });
   }
 }
