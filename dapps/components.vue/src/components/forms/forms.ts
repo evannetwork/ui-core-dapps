@@ -102,7 +102,6 @@ export default class Forms extends mixins(EvanComponent) {
 
   async created() {
     await this.loadAddressBook();
-    console.log(dataSetExamples);
 
     this.sampleForm = new EvanForm(this, {
       field1: {
