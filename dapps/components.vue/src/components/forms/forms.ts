@@ -28,12 +28,33 @@ import * as bcc from '@evan.network/api-blockchain-core';
 import { Dispatcher, DispatcherInstance } from '@evan.network/ui';
 import * as dispatchers from '../../dispatchers/registry';
 
+import dataSetExamples from './dummydata.json';
+
 interface SampleFormInterface extends EvanForm {
   field1: string;
   field2: string;
   field3: number;
   select: string;
   files: any;
+}
+
+interface PermissionsInterface {
+  [property: string]: {
+    read: boolean,
+    readWrite: boolean,
+    fields: string[]
+  };
+}
+
+interface DataSetInterface {
+  [datasetkey: string]: {
+    label: string,
+    permissions: PermissionsInterface
+  };
+}
+
+interface DataSetExamplesInterface {
+  [datasetkey: string]: DataSetInterface;
 }
 
 @Component({ })
@@ -80,7 +101,8 @@ export default class Forms extends mixins(EvanComponent) {
   dispatcherWatch = null;
 
   async created() {
-    await this.loadAddressBook()
+    await this.loadAddressBook();
+    console.log(dataSetExamples);
 
     this.sampleForm = new EvanForm(this, {
       field1: {
@@ -170,6 +192,34 @@ export default class Forms extends mixins(EvanComponent) {
         'label': addressBook[key].alias,
         'value': key
       }
+    });
+  }
+
+  /**
+   * Mock: Loads user permissions on a certain container according to a given user hash.
+   *
+   * @param userId user hash
+   */
+  loadPermissions(userId: string) {
+    return new Promise( (resolve, reject) => {
+      setTimeout(() => {
+        if (dataSetExamples[userId]) {
+          resolve(dataSetExamples[userId]);
+        } else {
+          // for test cases take always first from dummy data
+          resolve(Object.values(dataSetExamples)[0]);
+          // reject(new Error(`No dummy data for this user id: ${userId}`));
+        }
+      }, 2000);
     })
+  }
+
+  /**
+   * Mock: will be replaced by permissions update function.
+   */
+  updatePermissions(permissions) {
+    console.log('permissions to upodate:', JSON.stringify(permissions));
+
+    return new Promise((r, _) => {r(true)});
   }
 }

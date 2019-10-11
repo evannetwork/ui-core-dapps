@@ -129,7 +129,7 @@
     </template>
 
     <div class="container white-box p-3">
-      <evan-permissions-editor />
+      <evan-permissions-editor :loadPermissions="loadPermissions" :updatePermissions="updatePermissions" />
     </div>
 
   </div>
