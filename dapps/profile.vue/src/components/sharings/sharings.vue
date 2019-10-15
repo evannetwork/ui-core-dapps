@@ -18,7 +18,7 @@ the following URL: https://evan.network/license/
 */
 
 <template>
-  <div class="container-wide" id="profile-sharings">
+  <div class="profile-sharings container-wide">
       <evan-loading v-if="loading" />
       <template v-else>
           
