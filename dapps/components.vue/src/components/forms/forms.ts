@@ -26,7 +26,6 @@ import { Prop, Watch } from 'vue-property-decorator';
 import { EvanComponent, EvanForm, EvanFormControl } from '@evan.network/ui-vue-core';
 import * as bcc from '@evan.network/api-blockchain-core';
 import { Dispatcher, DispatcherInstance } from '@evan.network/ui';
-import { DataSetPermissionsInterface } from '@evan.network/ui-vue-core/src/interfaces';
 import * as dispatchers from '../../dispatchers/registry';
 
 import dataSetExamples from './dummydata.json';
@@ -37,6 +36,29 @@ interface SampleFormInterface extends EvanForm {
   field3: number;
   select: string;
   files: any;
+}
+
+
+// TODO: replace interfaces by import from modules:
+// import { DataSetPermissionsInterface } from '@evan.network/ui-vue-core/src/interfaces';
+/**
+ * Interface for multiple dataset permissions object.
+ */
+export interface PermissionsInterface {
+  [property: string]: {
+    read: boolean,
+    readWrite: boolean,
+    fields?: string[]
+  };
+}
+
+/**
+ * Defines an object of permission interfaces representing all permission attributes of a data set.
+ */
+export interface DataSetPermissionsInterface {
+  label: string;
+  key: string;
+  permissions: PermissionsInterface;
 }
 
 interface DataSetExamplesInterface {
