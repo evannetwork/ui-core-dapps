@@ -26,6 +26,7 @@ import { Prop, Watch } from 'vue-property-decorator';
 import { EvanComponent, EvanForm, EvanFormControl } from '@evan.network/ui-vue-core';
 import * as bcc from '@evan.network/api-blockchain-core';
 import { Dispatcher, DispatcherInstance } from '@evan.network/ui';
+import { DataSetPermissionsInterface } from '@evan.network/ui-vue-core/src/interfaces';
 import * as dispatchers from '../../dispatchers/registry';
 
 import dataSetExamples from './dummydata.json';
@@ -38,23 +39,8 @@ interface SampleFormInterface extends EvanForm {
   files: any;
 }
 
-interface PermissionsInterface {
-  [property: string]: {
-    read: boolean,
-    readWrite: boolean,
-    fields: string[]
-  };
-}
-
-interface DataSetInterface {
-  [datasetkey: string]: {
-    label: string,
-    permissions: PermissionsInterface
-  };
-}
-
 interface DataSetExamplesInterface {
-  [datasetkey: string]: DataSetInterface;
+  [datasetkey: string]: DataSetPermissionsInterface;
 }
 
 @Component({ })
@@ -86,7 +72,7 @@ export default class Forms extends mixins(EvanComponent) {
     'Option 3',
     'Option 4',
     'Option 5'
-  ]
+  ];
 
   sampleForm: SampleFormInterface = null;
 
@@ -165,15 +151,15 @@ export default class Forms extends mixins(EvanComponent) {
   }
 
   handleSubmit(ev: Event): Promise<any> {
-    console.log(ev)
+    console.log(ev);
 
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        console.log('resolved')
+        console.log('resolved');
 
-        resolve('saved')
-      }, 1000)
-    })
+        resolve('saved');
+      }, 1000);
+    });
   }
 
   /**
@@ -190,7 +176,7 @@ export default class Forms extends mixins(EvanComponent) {
       return {
         'label': addressBook[key].alias,
         'value': key
-      }
+      };
     });
   }
 
@@ -210,7 +196,7 @@ export default class Forms extends mixins(EvanComponent) {
           // reject(new Error(`No dummy data for this user id: ${userId}`));
         }
       }, 2000);
-    })
+    });
   }
 
   /**
@@ -219,6 +205,6 @@ export default class Forms extends mixins(EvanComponent) {
   updatePermissions(permissions) {
     console.log('permissions to upodate:', JSON.stringify(permissions));
 
-    return new Promise((r, _) => {r(true)});
+    return new Promise((r, _) => { r(true); });
   }
 }
