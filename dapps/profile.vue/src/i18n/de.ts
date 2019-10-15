@@ -160,6 +160,10 @@ const i18n: any = {
       },
       "reload-hint": "Bitte laden Sie die Anwendung neu, wenn Sie die Spracheinstellungen geändert haben."
     },
+    "sharings": {
+      "desc": "Nachfolgend finden Sie alle Kontakte, mit denen Sie diese Profilinformationen derzeit teilen. Klicken Sie auf ein Profil, um die Berechtigungen anzupassen.", 
+      "title": "Freigaben für deine Profildaten"
+    },
     "type": {
       "change": "Ändern",
       "choose": "Profiltyp spezifieren",

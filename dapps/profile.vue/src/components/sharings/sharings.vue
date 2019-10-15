@@ -18,8 +18,20 @@ the following URL: https://evan.network/license/
 */
 
 <template>
-  <div>
-      <h1>Hallo Sharings View</h1>
+  <div class="container-wide" id="profile-sharings">
+      <evan-loading v-if="loading" />
+      <template v-else>
+          
+        <h3 class="font-weight-bold">{{ '_profile.sharings.title' | translate }}</h3>
+        <p>{{ '_profile.sharings.desc' | translate }}</p>
+
+        <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+
+      </template>
   </div>
 </template>
 

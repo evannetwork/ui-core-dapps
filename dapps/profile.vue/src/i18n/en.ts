@@ -160,6 +160,10 @@ const i18n: any = {
       },
       "reload-hint": "Please reload the application if you have changed the language settings."
     },
+    "sharings": {
+      "desc": "Below are all the contacts you currently share this profile information with. Click on a profile to adjust the permissions.", 
+      "title": "Your Profile Data Sharings"
+    },
     "type": {
       "change": "Change",
       "choose": "Specify Account Type",
