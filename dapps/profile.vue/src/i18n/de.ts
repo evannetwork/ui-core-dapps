@@ -26,7 +26,8 @@ const i18n: any = {
       "logout": "Ausloggen",
       "settings": "Einstellungen",
       "verifications": "Verifizierungen",
-      "wallet": "Wallet"
+      "wallet": "Wallet",
+      "sharings": "Freigaben"
     },
     "company": {
       "contact": {
