@@ -163,7 +163,16 @@ const i18n: any = {
     "sharings": {
       "desc": "Below are all the contacts with which you currently share your profile information. Click on a profile to adjust the permissions.", 
       "title": "Your Profile Data Sharings",
-      "no-data": "No profile data has been shared yet."
+      "no-data": "No profile data has been shared yet.",
+      "permission": {
+        "type": {
+          "fullAccess": "Full Access",
+          "fullRead": "Full Read Permissions",
+          "readWrite": "Individual Write and Read Permissions",
+          "read": "Individual Read Permissions",
+          "none": "No Permissions"
+        }
+      },
     },
     "type": {
       "change": "Change",
