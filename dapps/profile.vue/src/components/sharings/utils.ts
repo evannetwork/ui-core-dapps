@@ -18,7 +18,7 @@ the following URL: https://evan.network/license/
 */
 
 import { ContactInterface } from '@evan.network/ui-vue-core/src/interfaces';
-import { Container, Sharing } from '@evan.network/api-blockchain-core';
+import { Container } from '@evan.network/api-blockchain-core';
 import * as PermissionTypes from './permission-types';
 
 const getPermissionsType = (sharing, properties) => {
