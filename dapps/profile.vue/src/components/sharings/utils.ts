@@ -21,6 +21,12 @@ import { ContactInterface } from '@evan.network/ui-vue-core/src/interfaces';
 import { Container } from '@evan.network/api-blockchain-core';
 import * as PermissionTypes from './permission-types';
 
+/**
+ * return generell types of permissions
+ *
+ * @param sharing
+ * @param properties
+ */
 const getPermissionsType = (sharing, properties) => {
     const propertiesKeys = Object.keys(properties);
 
