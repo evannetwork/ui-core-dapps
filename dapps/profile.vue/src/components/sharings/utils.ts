@@ -104,7 +104,6 @@ export const getPermissions = async (runtime, containerAddress, accountId = runt
     const container = getContainer(runtime, containerAddress, accountId);
     const properties = await getContainerProperties(container);
     const shareConfigs = await container.getContainerShareConfigs();
-    const contacts = await getContacts(runtime);
 
     let configs =  shareConfigs.map(config => {
         // the own account should not take into consideration
@@ -112,17 +111,8 @@ export const getPermissions = async (runtime, containerAddress, accountId = runt
              return null;
         }
 
-        const contact = contacts.find(item => {
-            return item.value === config.accountId;
-        });
-
-        if (!contacts) {
-            return null;
-        }
-
         return {
             accountId: config.accountId,
-            alias: contact.label,
             permissionType: getPermissionsType(config, properties)
         };
     });
