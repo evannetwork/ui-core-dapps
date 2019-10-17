@@ -80,7 +80,6 @@ export const getContainerProperties = async (container: Container) => {
  * load the contacts for the current user, so we can display correct contact alias
  * @param runtime current runtime
  */
-
 export const getContacts = async (runtime): Promise<ContactInterface[]> => {
     delete runtime.profile.trees[runtime.profile.treeLabels.addressBook]; // why?
     let addressBook = (await runtime.profile.getAddressBook()).profile;
