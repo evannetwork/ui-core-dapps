@@ -239,8 +239,6 @@ export const updatePermissions = (runtime, accountId: string, containerPermissio
   return new Promise((resolve, reject) => {
     try {
       Object.keys(containerPermissions).forEach( (containerAddress: string) => {
-        console.log('containerAddress', containerAddress);
-
         const shareConfigs = createShareConfig(
           containerPermissions[containerAddress].permissions,
           oldContainerPermissions[containerAddress].permissions,
