@@ -29,7 +29,7 @@ import components from './components/registry';
 export * from './components/registry';
 export * from './dispatchers/registry';
 export { translations };
-
+ 
 /**
  * StartDapp function that is called by the ui-dapp-browser, including an container and the current
  * dbcp. So startup, it's evan time!
