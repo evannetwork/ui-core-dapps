@@ -30,7 +30,7 @@ import * as dappBrowser from '@evan.network/ui-dapp-browser';
 import { getIdentificationDetails } from '../verifications/notary/notary.lib';
 import * as dispatchers from '../../dispatchers/registry';
 
-import { getProfilePermissionDetails } from './permissionsUtils';
+import { getProfilePermissionDetails, updatePermissions } from './permissionsUtils';
 
 @Component({ })
 export default class ProfileDetailComponent extends mixins(EvanComponent) {
@@ -137,9 +137,5 @@ export default class ProfileDetailComponent extends mixins(EvanComponent) {
   /**
    * Mock: will be replaced by permissions update function. TODO
    */
-  updatePermissions(permissions) {
-    console.log('permissions to upodate:', JSON.stringify(permissions));
-
-    return new Promise((r, _) => { r(true); });
-  }
+  updatePermissions = updatePermissions;
 }

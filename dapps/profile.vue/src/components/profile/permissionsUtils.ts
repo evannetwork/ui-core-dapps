@@ -17,14 +17,17 @@
   the following URL: https://evan.network/license/
 */
 
-import { Container } from '@evan.network/api-blockchain-core';
+import { Container, ContainerShareConfig } from '@evan.network/api-blockchain-core';
+import { shareDispatcher } from '@evan.network/datacontainer.digitaltwin';
 
 /*
   Helper functions for permission handling.
 
   TODO:
+    - move to more common accessible location, own dapp?
     - move to class if necessary
-    - merge with other permissinos helper functions to one file
+    - merge with other permissinos helper functions to one module
+    - Currently it's only possible to extend permissions, implement the remove permissions API.
     - implement some caching
 */
 
@@ -127,7 +130,6 @@ const convertToPristinePermissions = (permissions: any) => {
   return permissions;
 };
 
-
 /**
  * Clones whole permissions Object and removes all access rights.
  *
@@ -150,8 +152,6 @@ const convertToPristine = (userPermissions) => {
 
 /**
  * Creates permissions mapping based on container properties, sharing configs for each user and the container itself.
- *
- * TODO: caching?
  *
  * @param runtime
  * @param param1
@@ -186,4 +186,81 @@ export const getProfilePermissionDetails = (runtime, label = 'Profile Data') => 
   const profileAddress = runtime.profile.profileContract.options.address;
 
   return createContainerPermissions(runtime, { containerAddress: profileAddress, label});
+};
+
+/**
+ * Creates shareConfig object containing only the updated permissions.
+ *
+ * @param permissions
+ * @param oldPermissions
+ * @param accountId
+ */
+const createShareConfig = (permissions, oldPermissions, accountId: string) => {
+  const shareConfigs = [ ];
+  const shareConfig: ContainerShareConfig = {
+    accountId,
+    read: [ ],
+    readWrite: [ ],
+    removeListEntries: [ ],
+  };
+
+  // iterate through properties and get new read / readWrite permissions
+  Object.keys(permissions).forEach(property => {
+    if (permissions[property].read && !oldPermissions[property].read) {
+      shareConfig.read.push(property);
+    }
+    if (permissions[property].readWrite && !oldPermissions[property].readWrite) {
+      shareConfig.readWrite.push(property);
+
+      // TODO: handle remove permission on lists
+      // if (this.plugin.template.properties[property].type === 'list') {
+      //   shareConfig.removeListEntries.push(property);
+      // }
+    }
+  });
+
+  // push the new share config into the share configs array
+  shareConfigs.push(shareConfig);
+
+  return shareConfigs;
+};
+
+/**
+ * Update all permissions of containers for user with accountId.
+ *
+ * @param runtime: bcc.runtime
+ * @param accountId: string - the account to be shared with.
+ * @param containerPermissions: any - the new permissions object
+ * @param oldContainerPermissions: any - the old permissions object
+ */
+export const updatePermissions = (runtime, accountId: string, containerPermissions, oldContainerPermissions) => {
+  const containerShareConfigs = [];
+
+  return new Promise((resolve, reject) => {
+    try {
+      Object.keys(containerPermissions).forEach( (containerAddress: string) => {
+        console.log('containerAddress', containerAddress);
+
+        const shareConfigs = createShareConfig(
+          containerPermissions[containerAddress].permissions,
+          oldContainerPermissions[containerAddress].permissions,
+          accountId
+        );
+
+        const data = {
+          address: containerAddress,
+          shareConfigs,
+          bMailContent: false
+        };
+
+        containerShareConfigs.push(data);
+      });
+    } catch (e) {
+      reject (e);
+    }
+
+    shareDispatcher.start(runtime, containerShareConfigs);
+
+    resolve();
+  });
 };
