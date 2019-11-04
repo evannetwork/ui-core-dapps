@@ -20,11 +20,13 @@
 <template>
   <div>
     <evan-form
+      :editable="onlyForm || $store.state.profileDApp.permissions.readWrite.indexOf('deviceDetails') !== -1"
       :form="deviceDetailForm"
+      :handleShare="() => $store.commit('toggleSidePanel', 'sharing')"
       :i18nScope="'_profile.device.detail'"
       :isLoading="$store.state.dispatcher.curr.running.updateProfileDispatcher"
+      :shareable="$route.params.address === $store.state.runtime.activeAccount"
       :title="'_profile.device.detail.title' | translate"
-      :handleShare="() => $store.commit('toggleSidePanel', 'sharing')"
       @save="changeProfileData()">
     </evan-form>
   </div>

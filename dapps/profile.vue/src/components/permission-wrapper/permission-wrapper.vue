@@ -19,25 +19,23 @@
 
 <template>
   <div>
-    <evan-form
-      class="mt-2 mb-8"
-      ref="form"
-      :editable="onlyForm || $store.state.profileDApp.permissions.readWrite.indexOf('contact') !== -1"
-      :enableCancel="onlyEdit ? false : true"
-      :form="form"
-      :handleShare="() => $store.commit('toggleSidePanel', 'sharing')"
-      :i18nScope="'_profile.company.contact'"
-      :isLoading="!onlyForm && $store.state.dispatcher.curr.running.updateProfileDispatcher"
-      :onlyForm="onlyForm"
-      :shareable="$store.state.runtime && $route.params.address === $store.state.runtime.activeAccount"
-      :stacked="stacked"
-      :title="'_profile.company.contact.title' | translate"
-      @save="changeProfileData()">
-    </evan-form>
+    <div class="mt-2 mb-8"
+      v-if="!entryName || $store.state.profileDApp.permissions.read.indexOf(entryName) === -1">
+      <div class="d-flex justify-content-between align-items-center pb-1" v-if="!onlyForm">
+        <h5 class="my-0 py-0 text-uppercase font-weight-bold">
+          <i class="mdi mdi-lock mr-2" />
+          {{ `_profile.not-permitted.${ entryName }` | translate }}
+        </h5>
+      </div>
+      <p class="mt-3">
+        {{ '_profile.not-permitted.desc' | translate }}
+      </p>
+    </div>
+    <slot v-else></slot>
   </div>
 </template>
 
 <script lang="ts">
-  import Component from './contact';
+  import Component from './permission-wrapper';
   export default Component;
 </script>
