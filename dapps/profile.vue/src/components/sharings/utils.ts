@@ -146,6 +146,11 @@ export const getProfilePermissions = async (runtime) => {
  * @param shareConfigs: any - the permissions object
  */
 export const removeAllPermissions = (runtime, shareConfigs) => {
+
+  // push all permissions to remove into the readWrite object
+  shareConfigs.readWrite.push(...shareConfigs.read);
+  delete shareConfigs.read;
+
   return new Promise((resolve, reject) => {
     try {
         const dataSharing = {
