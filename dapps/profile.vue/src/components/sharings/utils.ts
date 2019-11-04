@@ -148,8 +148,14 @@ export const getProfilePermissions = async (vueInstance) => {
 export const removeAllPermissions = (runtime, shareConfigs) => {
 
   // push all permissions to remove into the readWrite object
-  shareConfigs.readWrite.push(...shareConfigs.read);
-  delete shareConfigs.read;
+  if (!shareConfigs.readWrite) {
+    shareConfigs.readWrite = [];
+  }
+
+  if (shareConfigs.read) {
+    shareConfigs.readWrite.push(...shareConfigs.read);
+    delete shareConfigs.read;
+  }
 
   return new Promise((resolve, reject) => {
     try {
