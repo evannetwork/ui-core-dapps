@@ -18,17 +18,16 @@
 */
 
 // vue imports
-import Vue from 'vue';
 import Component, { mixins } from 'vue-class-component';
-import { Prop } from 'vue-property-decorator';
 
 // evan.network imports
 import { EvanComponent } from '@evan.network/ui-vue-core';
-import * as bcc from '@evan.network/api-blockchain-core';
 import * as dappBrowser from '@evan.network/ui-dapp-browser';
 
-import { getIdentificationDetails } from '../verifications/notary/notary.lib';
 import * as dispatchers from '../../dispatchers/registry';
+import { sortFilters } from '../utils/shareSortFilters';
+
+import { getProfilePermissionDetails, updatePermissions } from '../../lib/permissionsUtils';
 
 @Component({ })
 export default class ProfileDetailComponent extends mixins(EvanComponent) {
@@ -41,6 +40,7 @@ export default class ProfileDetailComponent extends mixins(EvanComponent) {
    * Address of the user that should be loaded
    */
   address = '';
+
   /**
    * Currents users account information
    */
@@ -56,15 +56,17 @@ export default class ProfileDetailComponent extends mixins(EvanComponent) {
    */
   verificationCount = 0;
 
+  sortFilters = sortFilters;
+
   /**
    * Load the mail details
    */
   async created() {
-    const runtime = (<any>this).getRuntime();
     // fill empty address with current logged in user
-    this.address = this.$route.params.address || runtime.activeAccount;
+    this.address = this.$store.state.profileDApp.address;
+    this.userInfo = this.$store.state.profileDApp.data.accountDetails;
     // load balance and parse it to 3 decimal places
-    const amount = parseFloat((await dappBrowser.core.getBalance(runtime.activeAccount)).toFixed(3));
+    const amount = parseFloat((await dappBrowser.core.getBalance(this.address)).toFixed(3));
     this.balance = {
       amount: amount.toLocaleString(this.$i18n.locale()),
       timestamp: Date.now(),
@@ -95,9 +97,21 @@ export default class ProfileDetailComponent extends mixins(EvanComponent) {
    * Open the type switch modal
    */
   typeSwitchModal() {
-    if (this.userInfo.profileType === 'unspecified' && !this.isLoading()) {
+    if (this.userInfo.profileType === 'user' && !this.isLoading()) {
       (this as any).$refs.profileType.show();
     }
+  }
+
+  /**
+   * computed property
+   * selected shared contacts from vuex store
+   */
+  get selectedSharedContacts() {
+    return (this as any).$store.state.uiState.profile.selectedSharedContacts;
+  }
+
+  set selectedSharedContacts(contacts) {
+    (this as any).$store.commit('setSelectedSharedContacts', contacts);
   }
 
   /**
@@ -109,8 +123,31 @@ export default class ProfileDetailComponent extends mixins(EvanComponent) {
     this.userInfo = userInfo;
 
     dispatchers.updateProfileDispatcher.start((<any>this).getRuntime(), {
+      address: this.$store.state.profileDApp.address,
       formData: userInfo,
       type: 'accountDetails'
     });
   }
+
+  /**
+   * Returns the permissions mapping for certain user. If nothing is shared with the user, copy from own and set all to
+   * denied.
+   *
+   * @param user: string - the user id.
+   */
+  async loadPermissions(user: string) {
+    const runtime = (<any>this).getRuntime();
+    const allPermissions = await getProfilePermissionDetails(runtime, this.$route.params.address);
+
+    if (!allPermissions[user]) {
+      return allPermissions['new'];
+    }
+
+    return allPermissions[user];
+  }
+
+  /**
+   * Mock: will be replaced by permissions update function. TODO
+   */
+  updatePermissions = updatePermissions;
 }

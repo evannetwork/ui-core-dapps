@@ -8,6 +8,24 @@
 ### Deprecations
 
 
+## Version 3.11.0
+### Features
+- use `user` profile instead of `unspecified`
+- `profile.vue` (v3.4.0)
+  - add sharing for profile categories
+  - use correct route handling
+  - add verification detail side panel
+  - make company form data components usable from extern
+  - support that external profiles can opened
+- `onboarding.vue` (v3.2.0)
+  - add company account type creation
+- `addressbook.vue` (v3.1.1)
+  - fix empty alias contact loading
+
+### Fixes
+- update gulp build scripts to be compatible node 12
+
+
 ## Version 3.10.0
 ### Features
 - add v-select form control for inputs and options selection as well

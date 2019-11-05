@@ -33,7 +33,7 @@ if (coreRuntime.environment === 'testcore') {
 }
 
 // const agentUrl = 'http://192.168.100.56:8080'
-const agentUrl = 'https://agents.test.evan.network'
+const agentUrl = 'https://agents.test.evan.network';
 
 /**
  * Requests the request/close action to clear open requests, when the identification process has
@@ -114,12 +114,13 @@ async function getIdentificationDetails(runtime: bcc.Runtime, address: string, r
 }
 
 /**
- * Gets the issued verifications.
+ * Get the verifications for the current opened account.
  *
- * @param      {bcc.Runtime}  runtime  bcc runtime
+ * @param      {EvanComponent}  vueInstance  vue instance, where the profileDApp vuex was loaded for
+ *                                           a opened account.
  */
-async function getIssuedVerifications(runtime) {
-  const verifications = await runtime.profile.getBcContract('verifications', 'notary');
+async function getIssuedVerifications(vueInstance) {
+  const verifications = await vueInstance.$store.state.profileDApp.profile.getBcContract('verifications', 'notary');
   if (verifications) {
     bcc.Ipld.purgeCryptoInfo(verifications);
     return verifications;
@@ -184,4 +185,4 @@ export {
   issueVerification,
   notarySmartAgentAccountId,
   triggerRequestReload,
-}
+};

@@ -19,14 +19,11 @@
 
 // vue imports
 import Component, { mixins } from 'vue-class-component';
-import Vue from 'vue';
-import { Prop, Watch } from 'vue-property-decorator';
 
 // evan.network imports
-import { EvanComponent, EvanForm, EvanFormControl } from '@evan.network/ui-vue-core';
-import * as bcc from '@evan.network/api-blockchain-core';
-import { Dispatcher, DispatcherInstance } from '@evan.network/ui';
-import * as dispatchers from '../../dispatchers/registry';
+import { EvanComponent, EvanForm } from '@evan.network/ui-vue-core';
+
+import dataSetExamples from './dummydata.json';
 
 interface SampleFormInterface extends EvanForm {
   field1: string;
@@ -34,6 +31,19 @@ interface SampleFormInterface extends EvanForm {
   field3: number;
   select: string;
   files: any;
+}
+
+
+import { ContainerPermissionsInterface } from '@evan.network/ui-vue-core/src/interfaces';
+/**
+ * Interface for multiple dataset permissions object.
+ */
+export interface PermissionsInterface {
+  [property: string]: {
+    read: boolean,
+    readWrite: boolean,
+    fields?: string[]
+  };
 }
 
 @Component({ })
@@ -44,6 +54,10 @@ export default class Forms extends mixins(EvanComponent) {
   isPublic = true;
   stacked = false;
   onlyForm = false;
+  sortFilters = JSON.stringify({
+    containerId123: ['Number of Seats', 'Manufactorer', 'Flight Log', 'Parts'],
+    containerId456: ['Marke', 'Anzahl Räder', 'Farbe', 'Sitzplätze', 'Kofferraum', 'Nutzung', 'Kilometerstände', 'Fahrtenbuch']
+  }, undefined, 2);
 
   /**
    * Rerender everything
@@ -65,7 +79,7 @@ export default class Forms extends mixins(EvanComponent) {
     'Option 3',
     'Option 4',
     'Option 5'
-  ]
+  ];
 
   sampleForm: SampleFormInterface = null;
 
@@ -80,7 +94,7 @@ export default class Forms extends mixins(EvanComponent) {
   dispatcherWatch = null;
 
   async created() {
-    await this.loadAddressBook()
+    await this.loadAddressBook();
 
     this.sampleForm = new EvanForm(this, {
       field1: {
@@ -144,15 +158,15 @@ export default class Forms extends mixins(EvanComponent) {
   }
 
   handleSubmit(ev: Event): Promise<any> {
-    console.log(ev)
+    console.log(ev);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _) => {
       setTimeout(() => {
-        console.log('resolved')
+        console.log('resolved');
 
-        resolve('saved')
-      }, 1000)
-    })
+        resolve('saved');
+      }, 1000);
+    });
   }
 
   /**
@@ -169,7 +183,45 @@ export default class Forms extends mixins(EvanComponent) {
       return {
         'label': addressBook[key].alias,
         'value': key
-      }
-    })
+      };
+    });
+  }
+
+  /**
+   * Mock: Loads user permissions on a certain container according to a given user hash.
+   *
+   * @param userId user hash
+   */
+  loadPermissions(userId: string) {
+    return new Promise( (resolve, _) => {
+      setTimeout(() => {
+        if (dataSetExamples[userId]) {
+          resolve(dataSetExamples[userId]);
+        } else {
+          // for test cases take always first from dummy data
+          resolve(Object.values(dataSetExamples)[0]);
+        }
+      }, 2000);
+    });
+  }
+
+  /**
+   * Mock: will be replaced by permissions update function.
+   */
+  updatePermissions(permissions: ContainerPermissionsInterface) {
+    console.log('permissions to upodate:', JSON.stringify(permissions));
+
+    return new Promise((r, _) => { r(true); });
+  }
+
+  isJsonString(str: string) {
+    try {
+      const json = JSON.parse(str);
+
+      return (typeof json === 'object');
+    } catch (e) {
+
+      return false;
+    }
   }
 }

@@ -20,9 +20,17 @@
 <template>
   <div>
     <evan-form
-      :form="registrationForm"
+      class="mt-2 mb-8"
+      ref="form"
+      :editable="onlyForm || $store.state.profileDApp.permissions.readWrite.indexOf('registration') !== -1"
+      :enableCancel="onlyEdit ? false : true"
+      :form="form"
+      :handleShare="() => $store.commit('toggleSidePanel', 'sharing')"
       :i18nScope="'_profile.company.registration'"
-      :isLoading="$store.state.dispatcher.curr.running.updateProfileDispatcher"
+      :isLoading="!onlyForm && $store.state.dispatcher.curr.running.updateProfileDispatcher"
+      :onlyForm="onlyForm"
+      :shareable="$store.state.runtime && $route.params.address === $store.state.runtime.activeAccount"
+      :stacked="stacked"
       :title="'_profile.company.registration.title' | translate"
       @save="changeProfileData()">
     </evan-form>

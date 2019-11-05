@@ -18,7 +18,6 @@
 */
 
 // vue imports
-import Vue from 'vue';
 import Component, { mixins } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 
@@ -29,6 +28,7 @@ import * as bcc from '@evan.network/api-blockchain-core';
 import * as dappBrowser from '@evan.network/ui-dapp-browser';
 
 import * as dispatchers from '../../../../dispatchers/registry';
+import ProfileMigrationLibrary from '../../../../lib/profileMigration';
 import { notarySmartAgentAccountId } from '../notary.lib';
 
 @Component({ })
@@ -73,6 +73,17 @@ export default class TopicDisplayComponent extends mixins(EvanComponent) {
    * listen for dispatcher updates
    */
   listeners: Array<Function> = [ ];
+
+  /**
+   * Name of the issuer, so it will be more understandable for the user
+   */
+  issuerName = '';
+  issuer = '';
+
+  /**
+   * Show more technical specific information behind the verification information
+   */
+  showTechnicalDetail = false;
 
   /**
    * Load verification details.
@@ -147,57 +158,72 @@ export default class TopicDisplayComponent extends mixins(EvanComponent) {
       verificationQuery,
     );
 
-    this.verification.verifications
-      .forEach(async (subVerification) => {
-        try {
-          const contentKey = await runtime.profile.getBcContract(
-            'contracts',
-            runtime.web3.utils.soliditySha3(`verifications,${subVerification.details.id},contentKey`)
-          );
-          const hashKey = await runtime.profile.getBcContract(
-            'contracts',
-            runtime.web3.utils.soliditySha3(`verifications,${subVerification.details.id},hashKey`)
-          );
-          const fileHash = JSON.parse(subVerification.details.data);
+    await Promise.all(this.verification.verifications.map(async (subVerification) => {
+      try {
+        const contentKey = await this.$store.state.profileDApp.profile.getBcContract(
+          'contracts',
+          runtime.web3.utils.soliditySha3(`verifications,${subVerification.details.id},contentKey`)
+        );
+        const hashKey = await this.$store.state.profileDApp.profile.getBcContract(
+          'contracts',
+          runtime.web3.utils.soliditySha3(`verifications,${subVerification.details.id},hashKey`)
+        );
+        const fileHash = JSON.parse(subVerification.details.data);
 
-          if (fileHash !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
-            if (subVerification.details.topic === '/evan/company') {
-              const hashFiles = await (<any>runtime.dfs).get(fileHash);
-              const foundFiles = JSON.parse(hashFiles)
-              for (let file of foundFiles) {
-                file.file = await (<any>runtime.dfs).get(file.file, true);
+        if (fileHash !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+          if (subVerification.details.topic === '/evan/company') {
+            const hashFiles = await (<any>runtime.dfs).get(fileHash);
+            const foundFiles = JSON.parse(hashFiles);
+            for (let file of foundFiles) {
+              file.file = await (<any>runtime.dfs).get(file.file, true);
+              file.size = file.file.length;
+              this.files.push(await FileHandler.fileToContainerFile(file));
+            }
+          } else {
+            const cryptoAlgorithFiles = 'aesBlob';
+            const cryptoAlgorithHashes = 'aesEcb';
+            const encodingEncrypted = 'hex';
+            const encodingUnencryptedHash = 'hex';
+            const hashCryptor = runtime.cryptoProvider.getCryptorByCryptoAlgo('aesEcb');
+            const dencryptedHashBuffer = await hashCryptor.decrypt(
+              Buffer.from(fileHash.substr(2), encodingUnencryptedHash), { key: hashKey });
+
+            const retrieved = await (<any>runtime.dfs).get('0x' + dencryptedHashBuffer.toString('hex'), true);
+            const cryptor = runtime.cryptoProvider.getCryptorByCryptoAlgo(cryptoAlgorithFiles);
+            const decrypted = await cryptor.decrypt(retrieved, { key: contentKey });
+
+            if (decrypted.companyName) {
+              this.companyName = decrypted.companyName;
+            }
+
+            if (decrypted) {
+              for (let file of decrypted) {
                 file.size = file.file.length;
                 this.files.push(await FileHandler.fileToContainerFile(file));
               }
-            } else {
-              const cryptoAlgorithFiles = 'aesBlob'
-              const cryptoAlgorithHashes = 'aesEcb'
-              const encodingEncrypted = 'hex'
-              const encodingUnencryptedHash = 'hex'
-              const hashCryptor = runtime.cryptoProvider.getCryptorByCryptoAlgo('aesEcb')
-              const dencryptedHashBuffer = await hashCryptor.decrypt(
-                Buffer.from(fileHash.substr(2), encodingUnencryptedHash), { key: hashKey })
-
-              const retrieved = await (<any>runtime.dfs).get('0x' + dencryptedHashBuffer.toString('hex'), true);
-              const cryptor = runtime.cryptoProvider.getCryptorByCryptoAlgo(cryptoAlgorithFiles)
-              const decrypted = await cryptor.decrypt(retrieved, { key: contentKey });
-
-              if (decrypted.companyName) {
-                this.companyName = decrypted.companyName;
-              }
-
-              if (decrypted) {
-                for (let file of decrypted) {
-                  file.size = file.file.length;
-                  this.files.push(await FileHandler.fileToContainerFile(file));
-                }
-              }
             }
           }
-        } catch (ex) {
-          runtime.logger.log(`Could not decrypt verification files: ${ ex.message }`, 'error');
         }
-      });
+      } catch (ex) {
+        runtime.logger.log(`Could not decrypt verification files: ${ ex.message }`, 'error');
+      }
+    }));
+
+    // get the issuer info, so it can be displayed
+    this.issuer = this.verification.verifications[0].details.issuer;
+
+    // check for predefined instances
+    if (this.issuer === notarySmartAgentAccountId) {
+      this.issuerName = this.$t('_profile.verifications.notary.notary');
+    } else {
+      // load from addressbook
+      const addressbook = await this.$store.state.profileDApp.profile.getAddressBook();
+      if (addressbook[this.issuer] && addressbook[this.issuer].alias) {
+        this.issuerName = addressbook[this.issuer];
+      } else {
+        this.issuerName = this.issuer
+      }
+    }
   }
 
   /**
@@ -215,5 +241,21 @@ export default class TopicDisplayComponent extends mixins(EvanComponent) {
         topic: this.topic,
       }
     );
+  }
+
+  /**
+   * Open the detail swipe panel for the current topic.
+   */
+  async showDetail() {
+    // try to load company name from profile registration container
+    if (!this.companyName) {
+      const runtime: bcc.Runtime = (<any>this).getRuntime();
+
+      this.companyName = (
+        await ProfileMigrationLibrary.loadProfileData(this, 'registration') || {}
+      ).company || runtime.activeAccount;
+    }
+
+    (this as any).$store.commit('toggleSidePanel', this.topic);
   }
 }

@@ -32,29 +32,43 @@ import * as evanUi from '@evan.network/ui';
 import { getDefaultDAppEns } from '../../utils';
 
 interface ProfileFormInterface extends EvanForm {
+  accountType: EvanFormControl;
   alias: EvanFormControl;
   password0: EvanFormControl;
   password1: EvanFormControl;
+  termsAccepted: EvanFormControl;
 }
 
 @Component({ })
 export default class SignUp extends mixins(EvanComponent) {
-  // current mnemonic value as text
+  /**
+   * current mnemonic value as text
+   */
   mnemonic = '';
 
-  // use to cancel riddle
+  /**
+   * use to cancel riddle
+   */
   originalMnemonic = '';
 
-  // is the current mnemonic valid?
+  /**
+   * is the current mnemonic valid?
+   */
   validMnemonic = false;
 
-  // is the current mnemonic / password is currently checking?
+  /**
+   * is the current mnemonic / password is currently checking?
+   */
   checking = false;
 
-  // recaptcha value
+  /**
+   * recaptcha value
+   */
   recaptchaToken = null as any;
 
-  // check if the recaptcha is initialzing
+  /**
+   * check if the recaptcha is initialzing
+   */
   initialzing = true;
 
   /**
@@ -72,13 +86,19 @@ export default class SignUp extends mixins(EvanComponent) {
    */
   activeStep = 0;
 
-  // currently creating the profile
+  /**
+   * currently creating the profile
+   */
   creatingProfile = 0;
 
-  // track the time that the profile took to be created
+  /**
+   * track the time that the profile took to be created
+   */
   creationTime = -1;
 
-  // timeout to show next profile creation img
+  /**
+   * timeout to show next profile creation img
+   */
   timeoutCreationStatus = null as any;
 
   /**
@@ -87,14 +107,29 @@ export default class SignUp extends mixins(EvanComponent) {
   loading = true;
 
   /**
+   * Show onboarded dialog with optional contact accept dialog
+   */
+  onboardedDialog = false;
+
+  /**
    * override custom recaptcha ID
    */
-  recaptchaId = window.localStorage['evan-test-recaptchaId'] || '6LfoK1IUAAAAAOK0EbTv-IqtBq2NS-bvKWcUbm8r'
+  recaptchaId = window.localStorage['evan-test-recaptchaId'] || '6LfoK1IUAAAAAOK0EbTv-IqtBq2NS-bvKWcUbm8r';
+
+  /**
+   * Latest user information, saved before creating profile, so it could be recovered, when an error
+   * occures.
+   */
+  userData: any = {
+    accountDetails: {
+      accountType: 'user'
+    }
+  };
 
   async created() {
     this.profileForm = (<ProfileFormInterface>new EvanForm(this, {
       accountType: {
-        value: 'unspecified',
+        value: 'user',
       },
       alias: {
         value: '',
@@ -118,36 +153,15 @@ export default class SignUp extends mixins(EvanComponent) {
         value: false,
       }
     }));
-    // use this for debugginb
-    // this.mnemonicRiddleSolved = true;
-    // this.profileForm.alias.value = 'Test';
-    // this.profileForm.password0.value = 'Evan1234';
-    // this.profileForm.password1.value = 'Evan1234';
 
-    // set if from the created function to keep the correct disabled function context
-    this.steps = [
-      {
-        title: '_onboarding.sign-up.profile-informations',
-        disabled: () => {
-          return this.creatingProfile || this.activeStep > 2;
-        }
-      },
-      {
-        title: '_onboarding.sign-up.get-mnemonic',
-        disabled: () => {
-          return !this.profileForm.isValid ||
-            this.creatingProfile || this.activeStep > 2;
-        }
-      }
-    ];
+    // update onboarding progress steps
+    this.setSteps();
 
     // if the user was inivted, show the welcome page
     if (this.$route.query.inviteeAlias) {
       this.steps.push({
         title: '_onboarding.sign-up.welcome',
-        disabled: () => {
-          return this.activeStep !== 3;
-        }
+        disabled: () => this.activeStep !== 3,
       });
     }
 
@@ -235,7 +249,6 @@ export default class SignUp extends mixins(EvanComponent) {
     }
   }
 
-
   /**
    * Show the next status img and text for the profile creation.
    */
@@ -255,9 +268,8 @@ export default class SignUp extends mixins(EvanComponent) {
    */
   async createProfile() {
     if (this.recaptchaToken) {
-      const baseHost = evanUi.agentUrl;
-      const baseUrlFaucet = baseHost + '/api/smart-agents/faucet/';
-      const baseUrlOnboarding = baseHost + '/api/smart-agents/onboarding/';
+      // save user inputs, so it can be restored on error
+      this.userData = this.getUserData();
 
       // start profile creation animation and status display
       this.nextCreationStatus();
@@ -270,88 +282,17 @@ export default class SignUp extends mixins(EvanComponent) {
         const accountId = dappBrowser.lightwallet.getAccounts(vault, 1)[0];
         const privateKey = dappBrowser.lightwallet.getPrivateKey(vault, accountId);
 
-        // create runtime for blockchain interaction
         const runtime = await dappBrowser.bccHelper.createDefaultRuntime(
           bcc, accountId, vault.encryptionKey, privateKey);
-        const profile = runtime.profile;
 
-        // disable pinning
-        runtime.dfs.disablePin = true;
-
-        // use the frontend keyProvider and apply it to every runtime instance
-        runtime.keyProvider = new dappBrowser.KeyProvider({ }, accountId);
-        for (let key of Object.keys(runtime)) {
-          if (runtime[key].keyProvider) {
-            runtime[key].keyProvider = runtime.keyProvider;
-          } else if (runtime[key].options && runtime[key].options.keyProvider) {
-            runtime[key].options.keyProvider = runtime.keyProvider;
-          }
-        }
-
-        // set current keys within the keyProvider
-        runtime.keyProvider.setKeysForAccount(accountId, vault.encryptionKey);
-        // set my private and public keys to my addressbook
-        const dhKeys = runtime.keyExchange.getDiffieHellmanKeys();
-        await profile.addContactKey(accountId, 'dataKey', dhKeys.privateKey.toString('hex'));
-        await profile.addProfileKey(accountId, 'alias', this.profileForm.alias.value);
-        await profile.addPublicKey(dhKeys.publicKey.toString('hex'));
-
-        // set initial structure by creating addressbook structure and saving it to ipfs
-        const cryptor = runtime.cryptoProvider.getCryptorByCryptoAlgo('aesEcb');
-        const fileHashes = <any>{};
-        const sharing = await runtime.dataContract.createSharing(accountId);
-        const treeLabels = profile.treeLabels;
-        fileHashes.sharingsHash = sharing.sharingsHash;
-        fileHashes[treeLabels.addressBook] = await profile.storeToIpld(treeLabels.addressBook);
-        fileHashes[treeLabels.publicKey] = await profile.storeToIpld(treeLabels.publicKey);
-        fileHashes[treeLabels.addressBook] = await cryptor.encrypt(
-          bcc.buffer.from(fileHashes[treeLabels.addressBook].substr(2), 'hex'),
-          { key: sharing.hashKey, });
-        fileHashes[treeLabels.addressBook] = `0x${ fileHashes[treeLabels.addressBook]
-          .toString('hex') }`;
-
-        // construct profile creation call values
-        const msgString = 'Gimme Gimme Gimme!';
-        const signer = accountId.toLowerCase();
-        const pk = '0x' + vault.exportPrivateKey(signer, vault.pwDerivedKey);
-        const signature = await runtime.web3.eth.accounts.sign(msgString, pk).signature;
-
-        // reenable pinning
-        runtime.dfs.disablePin = false;
-
-        // trigger the profile creation using an maximum timeout of 60 seconds
-        const result = await new Promise(async (resolve, reject) => {
-          let rejected;
-          const creationTimeout = setTimeout(() => {
-            reject(new Error('Profile creation took longer than 60 seconds, request was canceld.'));
-          }, 60 * 1000);
-
-          // trigger smart agent to create the profile
-          try {
-            const handoutPayload: any = {
-              accountId: accountId,
-              signature: signature,
-              profileInfo: fileHashes,
-            };
-
-            // if no evan-test-mode is enable, ask for valid captchaToken
-            if (!window.localStorage['evan-test-mode']) {
-              handoutPayload.captchaToken = this.recaptchaToken;
-            }
-
-            await axios.post(`${ baseUrlFaucet }handout?apiVersion=1`, handoutPayload);
-
-            if (!rejected) {
-              resolve();
-            }
-          } catch (ex) {
-            if (!rejected) {
-              reject(ex);
-            }
-          }
-        });
-
-        dappBrowser.utils.log(result, 'info');
+        await bcc.Onboarding.createOfflineProfile(
+          runtime,
+          this.userData,
+          accountId,
+          privateKey,
+          this.recaptchaToken,
+          runtime.environment
+        );
 
         // check if onboarded, else throw it!
         if (!(await dappBrowser.bccHelper.isAccountOnboarded(accountId))) {
@@ -370,7 +311,8 @@ export default class SignUp extends mixins(EvanComponent) {
           if (!this.$route.query.inviteeAlias) {
             this.showMnemnonicModal();
           } else {
-            this.activeStep = 3;
+            this.creatingProfile = 0;
+            this.onboardedDialog = true;
           }
         }, 2000);
       } catch (ex) {
@@ -396,6 +338,79 @@ export default class SignUp extends mixins(EvanComponent) {
   navigateToEvan() {
     // do not use $router.push to force navigation triggering!
     window.location.hash = `/${ this.$route.query.origin || getDefaultDAppEns() }`;
+  }
+
+  /**
+   * Update step definitions according to the current selected profile type
+   */
+  setSteps() {
+    const creatingOrOnboarded = () => this.onboardedDialog;
+
+    // set if from the created function to keep the correct disabled function context
+    const steps = [
+      {
+        title: '_onboarding.sign-up.steps.base.title',
+        disabled: () => creatingOrOnboarded(),
+      },
+    ];
+
+    if (this.profileForm.accountType.value === 'company') {
+      // data company specific steps
+      steps.push({
+        title: '_onboarding.sign-up.steps.company.registration.title',
+        disabled: () => creatingOrOnboarded() || !this.profileForm.isValid,
+      });
+      steps.push({
+        title: '_onboarding.sign-up.steps.company.contact.title',
+        disabled: () => creatingOrOnboarded() ||
+          (this.$refs.companyRegistration && !this.$refs.companyRegistration.form.isValid),
+      });
+    }
+
+    // add finishing step
+    steps.push({
+      title: '_onboarding.sign-up.steps.captcha.title',
+      disabled: () => {
+        if (creatingOrOnboarded()) {
+          return true;
+        }
+
+        switch (this.profileForm.accountType.value) {
+          case 'company': {
+            return this.$refs.companyContact && !this.$refs.companyContact.form.isValid
+          }
+          default: {
+            return !this.profileForm.isValid;
+          }
+        }
+      },
+    })
+
+    // update final steps
+    this.steps = steps;
+  }
+
+  /**
+   * returns the current users profile information from the displayed formulars and steps.
+   */
+  getUserData() {
+    const userData: any = {
+      accountDetails: {
+        accountName: this.profileForm.alias.value,
+        profileType: this.profileForm.accountType.value
+      }
+    };
+
+    switch (userData.accountDetails.profileType) {
+      case 'company': {
+        userData.registration = this.$refs.companyRegistration.form.getFormData();
+        userData.contact = this.$refs.companyContact.form.getFormData();
+
+        break;
+      }
+    }
+
+    return userData;
   }
 }
 

@@ -30,7 +30,6 @@ import { EvanComponent, EvanForm, EvanFormControl } from '@evan.network/ui-vue-c
 
 // internal
 import * as dispatchers from '../../../../dispatchers/registry';
-import ProfileMigrationLibrary from '../../../../lib/profileMigration';
 
 interface RegistrationFormInterface extends EvanForm {
   company: EvanFormControl;
@@ -48,57 +47,74 @@ export default class CompanyRegistrationForm extends mixins(EvanComponent) {
   @Prop() address;
 
   /**
-   * Evan form instance for registration data.
+   * Apply required fiels from outside.
    */
-  registrationForm: RegistrationFormInterface = null;
+  @Prop({ default: [ ] }) required;
 
   /**
-   * Watch for dispatcher updates
+   * hides the cancel button and directly jumps into formular edit mode
    */
-  listeners: Array<any> = [ ];
+  @Prop() onlyEdit;
+
+  /**
+   * Display inputs with labels in oneline or stacked.
+   */
+  @Prop({
+    default: false,
+  }) stacked: boolean;
+
+  /**
+   * Render only the formular without adding the formular wrapper.
+   */
+  @Prop() onlyForm: boolean;
+
+  /**
+   * Data that should be passed into the component, so it should not be loaded from api.
+   */
+  @Prop() data: RegistrationFormInterface;
+
+  /**
+   * Evan form instance for registration data.
+   */
+  form: RegistrationFormInterface = null;
 
   /**
    * Load the mail details
    */
   async created() {
-    // watch for save updates
-    this.listeners.push(dispatchers.updateProfileDispatcher.watch(($event: any) => {
-      if ($event.detail.status === 'finished' || $event.detail.status === 'deleted') {
-        this.loadProfileData();
-      }
-    }));
-
     // load profile data
     await this.loadProfileData();
   }
 
   /**
-   * Clear dispatcher listeners
+   * Directly open the formular edit mode.
    */
-  beforeDestroy() {
-    this.listeners.forEach(listener => listener());
+  mounted() {
+    this.onlyEdit && (this.$refs.form as any).setEditMode(true);
   }
 
   /**
    * Load the profile data an specify the registration form.
    */
   async loadProfileData() {
-    const runtime = (<any>this).getRuntime();
-    const registrationData = await ProfileMigrationLibrary.loadProfileData(runtime, 'registration');
+    const registrationData = this.data || this.$store.state.profileDApp.data.registration || {};
 
     // setup registration form
-    this.registrationForm = (<RegistrationFormInterface>new EvanForm(this, {
+    this.form = (<RegistrationFormInterface>new EvanForm(this, {
       company: {
         value: registrationData.company || '',
-        validate: function(vueInstance: CompanyRegistrationForm, form: RegistrationFormInterface) {
+        validate: function(vueInstance: CompanyRegistrationForm) {
           return this.value.length !== 0;
         },
       },
       court: {
         value: registrationData.court || '',
+        validate: function(vueInstance: CompanyRegistrationForm) {
+          return vueInstance.required.indexOf('court') === -1 || this.value.length !== 0;
+        },
       },
       register: {
-        value: registrationData.register || '',
+        value: registrationData.register || 'hrb',
         uiSpecs: {
           type: 'select',
           attr: {
@@ -107,21 +123,31 @@ export default class CompanyRegistrationForm extends mixins(EvanComponent) {
               { value: 'hrb', label: '_profile.company.registration.register.types.hrb', },
             ],
           }
-        }
+        },
+        validate: function(vueInstance: CompanyRegistrationForm) {
+          return vueInstance.required.indexOf('register') === -1 || this.value.length !== 0;
+        },
       },
       registerNumber: {
         value: registrationData.registerNumber || '',
+        validate: function(vueInstance: CompanyRegistrationForm) {
+          return vueInstance.required.indexOf('registerNumber') === -1 || this.value.length !== 0;
+        },
       },
       salesTaxID: {
         value: registrationData.salesTaxID || '',
+        validate: function(vueInstance: CompanyRegistrationForm) {
+          return vueInstance.required.indexOf('salesTaxID') === -1 || this.value.length !== 0;
+        },
       },
     }));
   }
 
   async changeProfileData() {
     dispatchers.updateProfileDispatcher.start((<any>this).getRuntime(), {
-      formData: this.registrationForm.getFormData(),
-      type: 'registration'
+      address: this.$store.state.profileDApp.address,
+      formData: this.form.getFormData(),
+      type: 'registration',
     });
   }
 }

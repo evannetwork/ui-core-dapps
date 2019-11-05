@@ -18,14 +18,11 @@
 */
 
 // vue imports
-import Vue from 'vue';
 import Component, { mixins } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 
 // evan.network imports
 import { EvanComponent } from '@evan.network/ui-vue-core';
-import * as bcc from '@evan.network/api-blockchain-core';
-import * as dappBrowser from '@evan.network/ui-dapp-browser';
 
 // internal
 import * as dispatchers from '../../../dispatchers/registry';
@@ -63,7 +60,7 @@ export default class ProfileTypeComponent extends mixins(EvanComponent) {
    * @param      {string}  type    The type
    */
   typeChanged(type: string) {
-    if (this.type !== 'unspecified') {
+    if (this.type !== 'user') {
       this.$emit('typeChanged', this.type);
       dispatchers.updateProfileDispatcher.start((<any>this).getRuntime(), {
         formData: {

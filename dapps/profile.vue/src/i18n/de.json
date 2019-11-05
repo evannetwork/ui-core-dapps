@@ -1,30 +1,11 @@
-/*
-  Copyright (C) 2018-present evan GmbH.
-
-  This program is free software: you can redistribute it and/or modify it
-  under the terms of the GNU Affero General Public License, version 3,
-  as published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Affero General Public License for more details.
-
-  You should have received a copy of the GNU Affero General Public License
-  along with this program. If not, see http://www.gnu.org/licenses/ or
-  write to the Free Software Foundation, Inc., 51 Franklin Street,
-  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
-  the following URL: https://evan.network/license/
-*/
-
-/* tslint:disable */
-const i18n: any = {
+{
   "_profile": {
     "breadcrumbs": {
       "addressbook.vue.evan": "Kontakte",
       "detail": "Profil",
       "logout": "Ausloggen",
       "settings": "Einstellungen",
+      "sharings": "Freigaben",
       "verifications": "Verifizierungen",
       "wallet": "Wallet"
     },
@@ -50,7 +31,7 @@ const i18n: any = {
           "label": "Straße und Hausnummer",
           "placeholder": "Meine Straße 15"
         },
-        "title": "Contact",
+        "title": "Kontaktdaten",
         "website": {
           "error": "Bitte geben Sie eine gültige URL ein!",
           "label": "Website",
@@ -61,7 +42,7 @@ const i18n: any = {
         "company": {
           "error": "Bitte geben Sie einen Firmennamen ein!",
           "label": "Unternehmen",
-          "placeholder": "Mein Unternehmen"
+          "placeholder": "Evan GmbH"
         },
         "court": {
           "error": "Bitte geben Sie die Informationen der Registrierungsstelle ein!",
@@ -85,9 +66,9 @@ const i18n: any = {
         "salesTaxID": {
           "error": "Bitte geben Sie die Umsatzsteuer-ID ein.",
           "label": "Umsatzsteuer-ID",
-          "placeholder": "Geben Sie Ihre Umsatzsteuer-ID ein..."
+          "placeholder": "DE999999999"
         },
-        "title": "Registrierung"
+        "title": "Registrierungsdaten"
       }
     },
     "current-balance": "Aktueller Kontostand",
@@ -103,7 +84,7 @@ const i18n: any = {
         "dataStreamSettings": {
           "error": "Bitte fügen Sie IoT-Einstellungsdateien ein!",
           "label": "IoT-Einstellungen",
-          "placeholder": "Hinzufügen von IoT-Einstellungsdateien"
+          "placeholder": "Fügen Sie IoT-Einstellungsdateien hinzu."
         },
         "location": {
           "error": "Bitte geben Sie einen Standort an!",
@@ -113,7 +94,7 @@ const i18n: any = {
         "manufacturer": {
           "error": "Bitte geben Sie einen Gerätehersteller an!",
           "label": "Hersteller",
-          "placeholder": "Geben Sie den Gerätehersteller ein"
+          "placeholder": "Geben Sie den Gerätehersteller ein."
         },
         "owner": {
           "error": "Bitte geben Sie eine korrekte Account-Adresse an!",
@@ -128,13 +109,13 @@ const i18n: any = {
         "settings": {
           "error": "Bitte Einstellungsdateien einfügen!",
           "label": "Einstellungen",
-          "placeholder": "Hinzufügen von Geräteeinstellungsdateien."
+          "placeholder": "Fügen Sie Geräteeinstellungsdateien hinzu."
         },
         "title": "Geräteinformationen",
         "type": {
           "error": "Bitte geben Sie einen Gerätetyp an!",
           "label": "Typ",
-          "placeholder": "Geben Sie den Gerätetyp ein"
+          "placeholder": "Geben Sie den Gerätetyp ein."
         }
       }
     },
@@ -144,6 +125,14 @@ const i18n: any = {
       "request-verification": "Verifikation wird beantragt...",
       "verification-accept": "Verifikation wird angenommen..."
     },
+    "not-permitted": {
+      "accountDetails": "Profil-Informationen",
+      "contact": "Kontaktdaten",
+      "desc": "Sie haben keine Berechtigungen, diese Daten einzusehen.",
+      "deviceDetails": "Geräteinformationen",
+      "registration": "Registrierungsdaten"
+    },
+    "not-permitted-view": "Sie haben keine Rechte, diese Daten für das ausgewählte Profil anzusehen.",
     "settings": {
       "desc": "Einstellungen",
       "dev-domain": {
@@ -159,12 +148,47 @@ const i18n: any = {
       },
       "reload-hint": "Bitte laden Sie die Anwendung neu, wenn Sie die Spracheinstellungen geändert haben."
     },
+    "sharing": {
+      "accountDetails": "Profildetails",
+      "accountName": "Name",
+      "city": "Ort",
+      "company": "Unternehmen",
+      "contact": "Kontaktdaten",
+      "country": "Firmensitz",
+      "court": "Registergericht",
+      "dataStreamSettings": "IoT-Einstellungen",
+      "description": "Um Ihre Profildaten mit anderen Kontakten zu teilen, wählen Sie die Optionen unten und klicken Sie auf “Freigaben aktualisieren”",
+      "deviceDetails": "Geräteinformationen",
+      "location": "Standort",
+      "manufacturer": "Hersteller",
+      "owner": "Eigentümer",
+      "permissionsTitle": "Profilzugriffsrechte",
+      "picture": "Bild",
+      "postalCode": "Postleitzahl",
+      "Profile Data": "Profildaten",
+      "profileType": "Profiltyp",
+      "register": "Register",
+      "registerNumber": "Registernummer",
+      "registration": "Registrierungsdaten",
+      "salesTaxID": "Umsatzsteuer-ID",
+      "serialNumber":"Seriennummer",
+      "settings": "Einstellungen",
+      "streetAndNumber": "Straße",
+      "type": "Typ",
+      "website": "Website"
+    },
+    "sharings": {
+      "desc": "Nachfolgend finden Sie alle Kontakte, mit denen Sie diese Profilinformationen derzeit teilen. Klicken Sie auf ein Profil, um die Berechtigungen anzupassen.",
+      "no-data": "Bisher wurden keine Profildaten freigegeben",
+      "title": "Freigaben für Ihre Profildaten"
+    },
     "type": {
       "change": "Ändern",
       "choose": "Profiltyp spezifieren",
       "missing-type": "Sie haben noch keinen Profiltypen ausgewählt. Nutzen Sie die nachfolgende Interaktionsfläche, um Ihr Profil genauer zu spezifieren.",
-      "no-verifications-avaiable": "Für ihren Profiltyp stehen aktuell keine Verifikationen zur Verfügung.",
-      "switch": "Geben Sie Ihren Profiltyp an"
+      "missing-type-foreign": "Für diese Profil wurde noch kein Profiltyp ausgewählt.",
+      "no-verifications-avaiable": "Für Ihren Profiltyp stehen aktuell keine Verifikationen zur Verfügung.",
+      "switch": "Geben Sie Ihren Profiltyp an."
     },
     "verifications": {
       "add": "Verifikation hinzufügen",
@@ -179,14 +203,14 @@ const i18n: any = {
       "error-loading": "Beim Laden der Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
       "next": "Weiter",
       "notary": {
-        "account-id": "Account-ID",
+        "account-id": "Identität",
         "check-updates": "Warte auf Aktualisierung...",
         "info": "Identifizieren Sie Ihr Konto als vertrauenswürdiges evan.network-Mitglied",
         "issue": {
           "accountId": {
-            "desc": "Account-ID für die die notarielle Bestätigung erstellt werden soll.",
-            "error": "Bitte geben Sie eine gültige Account ID an!",
-            "title": "Account-ID"
+            "desc": "Identität für die die notarielle Bestätigung erstellt werden soll.",
+            "error": "Bitte geben Sie eine gültige Addresse an!",
+            "title": "Identität"
           },
           "file-rename-hint": "Die hochgeladenen Dateien werden bei während der Austellung der Organisations-Verifikation in ein einheitliches Namensschema umbenannt.",
           "header": "Organisations-Verifikation ausstellen",
@@ -218,6 +242,7 @@ const i18n: any = {
         },
         "learn-more": "Mehr erfahren",
         "no-requests": "Sie haben noch keine notarielle Verifikation beantragt. Nutzen Sie die folgende Schaltfläche um diese anzufordern.",
+        "notary": "Notar",
         "pin": {
           "confirmation-code": "Ihr Bestätigungscode wurde erfolgreich erkannt.",
           "confirmation-code-desc": "Drucken Sie Ihren Bestätigungscode und senden Sie ihn per Post an die auf dem Dokument angegebene Adresse.",
@@ -228,8 +253,8 @@ const i18n: any = {
           "download": "Kein Drucker verfügbar? Download als PDF Datei",
           "generate-answer": "Code generieren",
           "header": "Authentifizierung",
-          "next-step": "Nach erfolgreicher Prüfung durch den Notar wird Ihr Account verifiziert.",
-          "next-step2": "Sie werden in Ihrer Account Mailbox darüber informiert.",
+          "next-step": "Nach erfolgreicher Prüfung durch den Notar wird Ihre Identität verifiziert.",
+          "next-step2": "Sie werden in Ihrer Mailbox darüber informiert.",
           "pin": {
             "desc": "Die per Brief erhaltene, sechstellige PIN.",
             "error": "Bitte geben Sie Ihre PIN ein, um fortzufahren.",
@@ -244,20 +269,10 @@ const i18n: any = {
         },
         "print": "Drucken",
         "request": {
-          "address": {
-            "desc": "Straße und Hausnummer",
-            "error": "Bitte geben Sie eine Anschrift an!",
-            "title": "Anschrift"
-          },
-          "city": {
-            "desc": "Ort",
-            "error": "Bitte geben Sie einen Ort an!",
-            "title": "Ort"
-          },
           "contact": {
-            "desc": "Vorname und Nachname",
             "error": "Bitte geben Sie eine Kontaktperson an!",
-            "title": "Ansprechpartner"
+            "label": "Ansprechpartner",
+            "placeholder": "Vorname und Nachname"
           },
           "costs": {
             "approve": "Ja, ich fordere die notarielle Verifikation zu den Transaktionskosten von 200 EVE an.",
@@ -265,30 +280,18 @@ const i18n: any = {
             "hint": "Das Anfordern einer notariellen Verifikation ist kostenpflichtig.",
             "title": "Kosten"
           },
-          "countries": {
-            "germany": "Deutschland"
-          },
-          "country": {
-            "desc": "Firmensitz eingeben",
-            "error": "Bitte geben Sie einen Firmensitz an!",
-            "title": "Firmensitz"
-          },
-          "court": {
-            "desc": "Ort des Amtsgerichts",
-            "error": "Bitte geben Sie das Registergericht an!",
-            "title": "Registergericht"
-          },
           "department": {
-            "desc": "Abteilung",
             "error": "Bitte geben Sie eine Abteilung an!",
-            "title": "Abteilung"
+            "label": "Abteilung",
+            "placeholder": "Abteilung"
           },
-          "description": "Bitte füllen Sie das Forumlar aus, um eine notarielle Verifikation ihrer Organisation anzufordern. Dieser Service ist kostenpflichtig.",
+          "description": "Bitte füllen Sie das Forumlar aus, um eine notarielle Verifikation Ihrer Organisation anzufordern. Dieser Service ist kostenpflichtig.",
+          "fill-missing": "Bitte füllen Sie alle erforderlichen Unternehmensinformationen und speichern Sie diese ab.",
           "header": "Notarielle Verifikation",
           "how": {
             "steps": {
               "1": {
-                "description": "Geben Sie Handelsregisternummer, Registergericht, ihre Anschrift und einen Ansprechpartner an.",
+                "description": "Geben Sie Handelsregisternummer, Registergericht, Ihre Anschrift und einen Ansprechpartner an.",
                 "title": "Anfordern"
               },
               "2": {
@@ -303,29 +306,15 @@ const i18n: any = {
             "title": "Schritte"
           },
           "mail": {
-            "body": "Hiermit beantrage Ich eine Notarielle Bestätigung für die folgenden Informationen: <ul><li>Evan-AccountID: {organizationEvanId}</li><li>Handelsregisternummer: {organizationRegistrationNumber}</li><li>Organisation: {organizationName}</li><li>Kontakt: {organizationContact}</li><li>Anschrift: {organizationStreetAddress}</li><li>Stadt: {organizationZipCode} {organizationCity} ,{organizationCountry}</li></ul>",
+            "body": "Hiermit beantrage Ich eine Notarielle Bestätigung für die folgenden Informationen: <ul><li>Identität: {organizationEvanId}</li><li>Handelsregisternummer: {organizationRegistrationNumber}</li><li>Organisation: {organizationName}</li><li>Kontakt: {organizationContact}</li><li>Anschrift: {organizationStreetAddress}</li><li>Stadt: {organizationZipCode} {organizationCity} ,{organizationCountry}</li></ul>",
             "title": "Beantragung einer Notariellen Bestätigung"
           },
           "not-enough-funds": "<i class=\"mdi mdi-alert-outline\"></i> Sie benötigen mindestens 200 EVE. Ihre Wallet hat nicht genügend EVE ({readableFunds} EVE)! <a href=\"/#/dashboard.evan/profile.evan/buy-eve\">EVE kaufen</a>",
-          "organization": {
-            "desc": "Firmenname",
-            "error": "Bitte geben Sie den Unternehmensname an!",
-            "title": "Firma"
-          },
+          "only-de": "Momentan wird die Notarverifikation nur für Unternehmen in Deutschland unterstützt. Bitte wählen Sie Deutschland als Unternehmenssitz aus.",
           "postal-address": "Anschrift",
           "proof": {
             "description": "Für die Verifikation Ihres Unternehmens erhalten Sie im nächsten Schritt eine PIN per Post vom Notar zu Händen der folgenden Person.",
             "title": "Bitte überprüfen Sie Ihre Daten."
-          },
-          "register": {
-            "desc": "Register",
-            "error": "Bitte geben Sie das Register an!",
-            "title": "Register"
-          },
-          "registerNumber": {
-            "desc": "98765",
-            "error": "Bitte geben Sie die Registernummer an!",
-            "title": "Registernummer"
           },
           "request-ident": "Anfordern",
           "request-verification": "Notarielle Verifikation anfordern",
@@ -333,21 +322,17 @@ const i18n: any = {
           "requested2": "Es wurden 200 EVE als Transaktionskosten von Ihrem Wallet abgebucht.",
           "requested3": "Sie erhalten in Kürze vom Notar Post!",
           "requesting": "Notarielle Verifikation wird angefordert...",
+          "requesting-account": "Anfragende Identität",
           "step": "Schritt",
           "who": {
-            "description": "Als eingetragenes Unternehmen können sie eine notarielle Verifikation ihres Accounts anfordern.",
+            "description": "Als eingetragenes Unternehmen können Sie eine notarielle Verifikation Ihrer Identität anfordern.",
             "link": "Mehr erfahren",
             "title": "Voraussetzungen"
           },
           "why": {
-            "description": "Mit der notariellen Verifikation wird bestätigt, dass ihr Unternehmen im Besitz der Account-ID {accountId} ist. Durch diese Bestätigung können Sie sich gegenüber ihren Geschäftspartnern ausweisen und verifizieren, dass Transaktionen, Digitale Zwillinge und Smart Contracts von Ihnen stammen.",
+            "description": "Mit der notariellen Verifikation wird bestätigt, dass Ihr Unternehmen im Besitz der Identität {accountId} ist. Durch diese Bestätigung können Sie sich gegenüber Ihren Geschäftspartnern ausweisen und verifizieren, dass Transaktionen, Digitale Zwillinge und Smart Contracts von Ihnen stammen.",
             "link": "Mehr erfahren",
             "title": "Vorteile"
-          },
-          "zipCode": {
-            "desc": "Postleitzahl",
-            "error": "Bitte geben Sie eine gültige Postleitzahl an!",
-            "title": "PLZ"
           }
         },
         "request-error": "Informationen zu dieser Anfrage konnten nicht geladen werden!",
@@ -378,11 +363,19 @@ const i18n: any = {
         "title": "Notarielle Verifikation",
         "verification": {
           "accept": "Annehmen",
+          "attachments": "Anhang",
+          "close-detail": "Schließen",
+          "created": "Erstellt",
+          "hide-technical": "Teschnische Details ausblenden",
           "incorrect": "Die Ihnen ausgestellten Organisationsidentifikationen wurden nicht von der korrekten Instanz erstellt.",
+          "issuer": "Issuer-ID",
           "organization": "Organisations-Verifikation",
           "organization-random": "Organisations-ID-Verifikation",
+          "show-technical": "Technische Details anzeigen",
           "status": "Status",
-          "verified-by": "Verified by"
+          "topic": "Pfad",
+          "topic-desc": "Dieses Konto der Firma {companyName} wurde notariell beglaubigt. Damit wurde die Authentizität des Unternehmens und die Zuordnung zu diesem Konto bescheinigt.",
+          "verified-by": "Verifiziert durch"
         }
       },
       "reload": "Neu-laden",
@@ -390,6 +383,3 @@ const i18n: any = {
     }
   }
 }
-/* tslint:enable */
-
-export default i18n;
