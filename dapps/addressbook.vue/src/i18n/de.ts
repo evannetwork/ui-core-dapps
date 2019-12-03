@@ -22,33 +22,34 @@ export default{
   "_addressbook": {
     "add": "Kontakt hinzufügen",
     "addressbook": "Kontakte",
-    "addressbook-desc": "Übersicht über Ihre vertrauenswürdigen Kontakte",
+    "addressbook-desc": "Übersicht über Ihre Kontakte",
+    "addressbook-desc-long": "Fügen Sie Partner hier als Kontakt hinzu, um Informationen mit diesen zu teilen.",
     "alias": "Alias",
     "all": "Alle",
     "category": "Kategorie",
     "contact-form": {
       "accountId": {
         "desc": "Account-ID eines bekannten und bestehenden Profils.",
-        "error-added": "Die angebene Account-ID haben Sie bereits zu Ihren Kontakten hinzugefügt.",
-        "error-invalid": "Bitte geben Sie eine gültige Account-ID an! (e.g. 0x1637Fa43D44a1Fb415D858a3cf4F7F8596A4048F)",
+        "error-added": "Die angegebene Account-ID haben Sie bereits zu Ihren Kontakten hinzugefügt.",
+        "error-invalid": "Bitte geben Sie eine gültige Account-ID an! (z.B. 0x1637Fa43D44a1Fb415D858a3cf4F7F8596A4048F)",
         "title": "Account-ID"
       },
       "alias": {
-        "desc": "Nutzername des neuen Kontakts",
+        "desc": "Nutzername des neuen Partners für Ihre Kontaktübersicht",
         "error": "Bitte geben Sie einen Alias an!",
         "title": "Alias"
       },
       "bmail": {
-        "body": "Guten Tag,\n\nIch möchte Sie als Kontakt hinzufügen.\n\nMit freundlichen Grüßen,\n\n{fromName}",
+        "body": "Guten Tag,\n\nich möchte Sie als Kontakt hinzufügen.\n\nMit freundlichen Grüßen,\n\n{fromName}",
         "desc": "Der ausgewählte Benutzer wird per Blockchain-Mail / E-Mail benachrichtigt. Im folgenden Formular können Sie die Nachricht anpassen.",
         "title": "Kontaktanfrage"
       },
       "continue": "Weiter",
-      "desc": "Über dieses Formular können Sie einen Kontakt über eine bestehende evan.network Identität oder per E-Mail einladen. Sobald Sie einen Kontakt eingeladen haben, können Sie mit diesem sichere Nachrichten austauschen und ihn in Verträge einladen.",
-      "desc-email": "Sobald ein Nutzer per E-Mail eingeladen wird, können Sie diesen Kontakt nicht direkt verwenden, um mit diesem Daten zu teilen. Sobald der Anmeldeprozess des eingeladenen Benutzers abgeschlossen ist, erhalten Sie eine Blockchain Mail mit der Sie den Einladeprozess beenden und Kontaktdaten aktualisieren können. Weiterhin können Sie EVE als Startguthaben mitschicken.",
+      "desc": "Über dieses Formular können Sie einen Kontakt über eine bestehende evan.network Identität oder per E-Mail einladen. Sobald Sie einen Kontakt eingeladen haben, können Sie mit diesem Informationen austauschen.",
+      "desc-email": "Sie können hier einen weiteren Partner auf Basis der E-Mail einladen und ihm EVE für eine erste Interaktion im evan.network senden. Sobald sich Ihr Partner im evan.network angemeldet hat, erhalten Sie eine Benachrichtigung in Ihrem Account.",
       "email": {
         "desc": "E-Mail Adresse zum Einladen des Nutzers in das Netzwerk.",
-        "error-added": "Die angebene E-Mail Adresse haben Sie bereits zu Ihren Kontakten hinzugefügt.",
+        "error-added": "Die angegebene E-Mail Adresse haben Sie bereits zu Ihren Kontakten hinzugefügt.",
         "error-invalid": "Bitte geben Sie eine valide E-Mail Adresse an!",
         "title": "E-Mail"
       },
@@ -79,11 +80,11 @@ export default{
       "step2": "Einladungsnachricht",
       "submit": "Kontakt hinzufügen",
       "tags": {
-        "desc": "Leerzeichen separierte Schlagworte",
+        "desc": "Schlagworte getrennt durch Leerzeichen",
         "title": "Schlagworte"
       }
     },
-    "detail": "Kontakinformationen",
+    "detail": "Kontaktinformationen",
     "dispatcher": {
       "invite": "Kontakt einladen",
       "remove": "Kontakt entfernen",
@@ -96,7 +97,7 @@ export default{
     },
     "overview": "Übersicht",
     "remove-contact": {
-      "description": "Wollen Sie den Kontakt {alias} mit der Adresse {accountId} wirklich von Ihren Kontakten entfernen?",
+      "description": "Wollen Sie den Kontakt {alias} mit der Adresse {accountId} wirklich aus Ihren Kontakten entfernen?",
       "remove": "Kontakt entfernen",
       "title": "Kontakt entfernen"
     },

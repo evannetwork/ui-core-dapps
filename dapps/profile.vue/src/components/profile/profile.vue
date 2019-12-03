@@ -18,50 +18,45 @@
 */
 
 <template>
-
   <div class="profile-detail p-xxl-11 p-xl-6 p-3">
     <evan-loading v-if="loading"></evan-loading>
     <template v-else>
-      <div class="row">
-        <div class="col-xl-8 mb-3">
+      <div class="row profile-row">
+        <div class="col left-col mb-3">
           <profile-permission-wrapper entryName="accountDetails">
-            <evan-profile-preview
-              ref="profilePreview"
-              size="lg"
-              :accountDetails="userInfo"
-              :address="address"
-              :editable="true"
-              @typeClick="typeSwitchModal()"
-              @update="userInfo = $event"
-              @save="saveUserInfo"
-            />
-            <profile-type-switch
-              ref="profileType"
-              :type="userInfo.profileType"
-              v-if="$store.state.profileDApp.isMyProfile && userInfo"
-            />
+            <div class="d-flex align-items-center">
+              <evan-profile-preview
+                class="w-100"
+                ref="profilePreview"
+                size="lg"
+                :accountDetails="userInfo"
+                :address="address"
+                :editable="true"
+                @update="userInfo = $event"
+                @save="saveUserInfo"
+              />
+              <div class="mx-auto"></div>
+              <evan-button
+                v-if="$store.state.runtime && $route.params.address === $store.state.runtime.activeAccount"
+                type="secondary"
+                size="sm"
+                @click="() => $store.commit('toggleSidePanel', 'sharing')"
+              >
+                {{ '_evan.share' | translate }}
+              </evan-button>
+            </div>
           </profile-permission-wrapper>
         </div>
-        <div class="col-xl-4">
-          <a class="
-            d-block p-3 position-relative
-            bg-inverted rounded text-decoration-none"
-            style="height: 166px"
-            :href="$store.state.profileDApp.isMyProfile ? `${ dapp.fullUrl }/${ $store.state.runtime.activeAccount }/wallet` : null"
-            :class="{
-              'evan-highlight': $store.state.profileDApp.isMyProfile
-            }">
-            <h1>{{ balance.amount }} EVE</h1>
-            <small class="font-weight-semibold">{{ '_profile.current-balance' | translate }}</small>
-            <small class="position-absolute bottom-right p-2" style="opacity: 0.6">
-              {{ balance.timestamp | moment('LLL') }}
-            </small>
-          </a>
+        <div class="col right-col d-flex justify-content-end">
+          <evan-wallet-card
+            :accountDetails="userInfo"
+            :address="$route.params.address"
+          />
         </div>
       </div>
 
-      <div class="row" v-if="userInfo">
-        <div class="col-xl-8 mt-3">
+      <div class="row profile-row" v-if="userInfo">
+        <div class="col left-col mt-3">
           <div class="text-center" v-if="userInfo.profileType === 'user'">
             <template v-if="this.isLoading()">
               <evan-loading></evan-loading>
@@ -69,23 +64,48 @@
             </template>
             <template v-else-if="$store.state.profileDApp.isMyProfile">
               <h5>{{ '_profile.type.missing-type' | translate }}</h5>
-              <evan-button
-                class="mt-3"
-                type="primary"
-                :label="'_profile.type.choose' | translate"
-                @click="typeSwitchModal()">
-              </evan-button>
+
+              <div class="d-flex justify-content-center my-5">
+                <evan-card class="clickable fixed-size"
+                  v-for="(type, index) in profileTypes"
+                  :key="index"
+                  :class="{
+                    'ml-3': index !== 0,
+                    'evan-highlight active': newType === type,
+                  }"
+                  @click="newType = type">
+                  <evan-profile-picture
+                    class="mb-3"
+                    :src="`${ $store.state.profileBaseUrl }/assets/${ type }.svg`"
+                    :type="type"
+                    size="lg"
+                  />
+                  <h5 class="mb-3">{{ `_evan.profile.types.${ type }` | translate }}</h5>
+                  <small class="text-muted">{{ `_evan.profile.types.${ type }-desc` | translate }}</small>
+                </evan-card>
+              </div>
+
+              <div class="text-center mt-3">
+                <evan-button type="primary"
+                  :disabled="!newType"
+                  :label="'_profile.type.choose' | translate"
+                  @click="changeType()">
+                </evan-button>
+              </div>
             </template>
             <template v-else>
               <h5>{{ '_profile.type.missing-type-foreign' | translate }}</h5>
             </template>
           </div>
           <template v-if="userInfo.profileType === 'company'">
-            <profile-permission-wrapper entryName="registration">
-              <profile-company-registration :address="address"></profile-company-registration>
-            </profile-permission-wrapper>
             <profile-permission-wrapper entryName="contact">
               <profile-company-contact :address="address"></profile-company-contact>
+            </profile-permission-wrapper>
+            <profile-permission-wrapper
+              class="mt-5"
+              entryName="registration"
+              v-if="$store.state.profileDApp.data.contact.country === 'DE'">
+              <profile-company-registration :address="address"></profile-company-registration>
             </profile-permission-wrapper>
           </template>
           <profile-permission-wrapper entryName="deviceDetails"
@@ -93,7 +113,7 @@
             <profile-device-detail :address="address"></profile-device-detail>
           </profile-permission-wrapper>
         </div>
-        <div class="col-xl-4">
+        <div class="col right-col">
           <template v-if="verificationCount === 0">
             <evan-card class="mt-3"
               icon="mdi mdi-plus"
@@ -118,25 +138,39 @@
           </div>
         </div>
       </div>
+      <evan-swipe-panel
+        :isOpen="$store.state.uiState.swipePanel === 'sharing'"
+        :title="'_profile.sharing.permissionsTitle' | translate"
+        @hide="$store.state.uiState.swipePanel = ''"
+        alignment="right"
+        class="light"
+        ref="shareSidebar"
+        showBackdrop="true"
+        type="default"
+        v-if="userInfo">
+        <evan-permissions-editor
+          @init="permissionsEditor = $event"
+          :loadPermissions="loadPermissions"
+          :selectedContact="selectedSharedContacts.length > 0 ? selectedSharedContacts[0] : null"
+          :sortFilters="$store.state.profileDApp.sharingFilter"
+          :updatePermissions="updatePermissions"
+          i18nScope="_profile.sharing"
+        />
+        <template slot="footer" v-if="!!permissionsEditor">
+          <evan-button 
+            type="secondary" 
+            :label="$t('_evan.cancel')" 
+            @click="permissionsEditor.cancel()" 
+            :disabled="selectedSharedContacts.length === 0" />
+          <evan-button
+            type="primary"
+            :label="$t('_evan.sharing.update')"
+            :disabled="!permissionsEditor.permissionsChanged"
+            @click="permissionsEditor.writePermissions()"
+          />
+        </template>
+      </evan-swipe-panel>
     </template>
-    <evan-swipe-panel
-      class="light"
-      alignment="right"
-      ref="shareSidebar"
-      showBackdrop="true"
-      type="default"
-      :isOpen="$store.state.uiState.swipePanel === 'sharing'"
-      @hide="$store.state.uiState.swipePanel = ''"
-      v-if="userInfo"
-    >
-      <evan-permissions-editor
-        :loadPermissions="loadPermissions"
-        :selectedContact="selectedSharedContacts.length > 0 ? selectedSharedContacts[0] : null"
-        :sortFilters="sortFilters[userInfo.profileType]"
-        :updatePermissions="updatePermissions"
-        i18nScope="_profile.sharing"
-      />
-    </evan-swipe-panel>
   </div>
 </template>
 

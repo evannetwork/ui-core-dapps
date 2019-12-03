@@ -29,6 +29,8 @@ import * as dappBrowser from '@evan.network/ui-dapp-browser';
 
 import * as dispatchers from '../../dispatchers/registry';
 
+import { getPermissionSortFilter, } from '../utils/shareSortFilters';
+
 @Component({ })
 export default class ProfileRootComponent extends mixins(EvanComponent) {
   /**
@@ -81,7 +83,8 @@ export default class ProfileRootComponent extends mixins(EvanComponent) {
       this.loading = true;
     }
 
-    await this.setupProfile();
+    this.$store.state.loadingProfile = this.setupProfile();
+    await this.$store.state.loadingProfile;
     this.setNavEntries();
 
     if (this.$store.state.profileDApp.isMyProfile) {
@@ -122,7 +125,7 @@ export default class ProfileRootComponent extends mixins(EvanComponent) {
     }
 
     // load container data
-    if (profile.profileContainer && profileDApp.description) {
+    if (profile.profileContainer && profileDApp.description && profileDApp.description.dataSchema) {
       // load permissions
       const { readWrite, read } = await profile.profileContainer.getContainerShareConfigForAccount(
         activeAccount);
@@ -131,6 +134,7 @@ export default class ProfileRootComponent extends mixins(EvanComponent) {
         readWrite: readWrite || [ ],
       };
       profileDApp.data = await this.loadProfileEntries();
+      profileDApp.sharingFilter = getPermissionSortFilter(profileDApp.data);
     } else {
       if (profileDApp.isMyProfile) {
         profileDApp.permissions.read = [ 'accountDetails' ];
@@ -157,6 +161,11 @@ export default class ProfileRootComponent extends mixins(EvanComponent) {
           data[key] = await this.loadProfileEntry(runtime, profileDApp.profile, key);
         } catch (ex) {
           profileDApp.profile.log(`Could nor load accountDetails for ${ profileDApp.address }: ${ ex.message }`, 'error');
+        }
+
+        // fill empty values
+        if (!data[key]) {
+          data[key] = { };
         }
       }
     }));

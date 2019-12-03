@@ -69,7 +69,7 @@
               </div>
             </div>
 
-            <p class="w-100 mt-3 bg-warning p-3"
+            <p class="w-100 mt-3 bg-primary p-3"
               v-if="contactForm.emailInvite.value">
               {{ `${ formI18nScope }.desc-email` | translate }}
             </p>
@@ -148,7 +148,10 @@
 </template>
 
 <script lang="ts">
-  import Component from './add.ts';
+  import Component from './add';
   export default Component;
 </script>
 
+<style lang="scss" scoped>
+  @import './add.scss';
+</style>

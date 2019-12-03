@@ -17,12 +17,16 @@
   the following URL: https://evan.network/license/
 */
 
-import verificationAcceptDispatcher from './acceptVerification';
 import requestIdentificationDispatcher from './notary/requestIdentification';
-import updateProfileDispatcher from './profile/updateProfile';
+import sendEveDispatcher from './sendEve';
+import shareProfileDispatcher from './profile/share';
+import updateProfileDispatcher from './profile/update';
+import verificationAcceptDispatcher from './acceptVerification';
 
 export {
   requestIdentificationDispatcher,
+  sendEveDispatcher,
+  shareProfileDispatcher,
+  updateProfileDispatcher,
   verificationAcceptDispatcher,
-  updateProfileDispatcher
 };

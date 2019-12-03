@@ -24,65 +24,26 @@ import { Prop } from 'vue-property-decorator';
 // evan.network imports
 import { EvanComponent } from '@evan.network/ui-vue-core';
 
-// internal
-import * as dispatchers from '../../../dispatchers/registry';
-
 @Component({ })
-export default class ProfileTypeComponent extends mixins(EvanComponent) {
+export default class ProfileCreatingComponent extends mixins(EvanComponent) {
   /**
-   * Current profile type
+   * account type that should be created
    */
-  @Prop() type;
+  @Prop() type: string;
 
   /**
-   * All selectable types
+   * Creating status that should be displayed
    */
-  types = [
-    'company',
-    'device'
-  ];
+  @Prop() activeStep: number;
 
   /**
-   * Initially passed type, to check if another one was selected
+   * amount of steps that should be displayed
    */
-  initialType = '';
+  @Prop() maximumSteps: number;
 
   /**
-   * Load profile type
+   * Custom steps that should overwrite the default ones
    */
-  async created() {
-    this.initialType = this.type;
-  }
-
-  /**
-   * Trigger profile type change
-   *
-   * @param      {string}  type    The type
-   */
-  typeChanged(type: string) {
-    if (this.type !== 'user') {
-      this.$emit('typeChanged', this.type);
-      dispatchers.updateProfileDispatcher.start((<any>this).getRuntime(), {
-        formData: {
-          profileType: this.type
-        },
-        type: 'accountDetails'
-      });
-      (this.$refs.modal as any).hide();
-    }
-  }
-
-  /**
-   * Show the info modal.
-   */
-  show() {
-    (<any>this.$refs).modal.show();
-  }
-
-  /**
-   * Hide the info modal.
-   */
-  hide() {
-    (<any>this.$refs).modal.hide();
-  }
+  @Prop({ default: { } }) customSteps: Array<any>;
 }
+

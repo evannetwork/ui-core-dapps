@@ -25,7 +25,6 @@ import CompanyContactForm from './profile/company/contact/contact.vue';
 import CompanyRegistrationForm from './profile/company/registration/registration.vue';
 import DeviceDetailForm from './profile/device/detail/detail.vue';
 import PermissionWrapperComponent from './permission-wrapper/permission-wrapper.vue';
-import ProfileTypeComponent from './profile/type/type.vue';
 
 // import general components for the profile
 import LabeledList from './utils/labeled-list/labeled-list.vue';
@@ -48,7 +47,10 @@ import NotaryPinComponent from './verifications/notary/actions/pin/pin.vue';
 import NotaryRequestComponent from './verifications/notary/actions/request/request.vue';
 
 // topic display (the actual verification)
+import BuyEveComponent from './wallet/buy/BuyEve.vue';
 import NotaryTopicDisplayComponent from './verifications/notary/topic-display/topic-display.vue';
+import SendEveComponent from './wallet/send/SendEve.vue';
+import TransactionsComponent from './wallet/transactions/transactions.vue';
 
 // map them to element names, so they can be used within templates
 const componentRegistration: Array<ComponentRegistrationInterface> = [
@@ -56,7 +58,6 @@ const componentRegistration: Array<ComponentRegistrationInterface> = [
   { name: 'profile-company-contact', component: CompanyContactForm, },
   { name: 'profile-company-registration', component: CompanyRegistrationForm, },
   { name: 'profile-device-detail', component: DeviceDetailForm, },
-  { name: 'profile-type-switch', component: ProfileTypeComponent, },
   { name: 'profile-permission-wrapper', component: PermissionWrapperComponent, },
   // general
   { name: 'labeled-list', component: LabeledList },
@@ -71,6 +72,10 @@ const componentRegistration: Array<ComponentRegistrationInterface> = [
   { name: 'notary-info-dialog', component: NotaryInfoModalComponent, },
   { name: 'notary-topic-display', component: NotaryTopicDisplayComponent, },
   { name: 'notary-verification-card', component: NotaryCardComponent, },
+  // payment
+  { name: 'profile-buy-eve', component: BuyEveComponent },
+  { name: 'profile-send-eve', component: SendEveComponent },
+  { name: 'profile-transactions', component: TransactionsComponent }
 ];
 
 export default componentRegistration;

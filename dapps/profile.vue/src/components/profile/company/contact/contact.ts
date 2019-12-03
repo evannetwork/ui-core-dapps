@@ -52,6 +52,11 @@ export default class CompanyContactForm extends mixins(EvanComponent) {
   @Prop() address;
 
   /**
+   * Apply required fiels from outside.
+   */
+  @Prop({ default: [ ] }) required;
+
+  /**
    * Only allow the following countries
    */
   @Prop({ default: countries, }) restrictCountries: Array<string>;
@@ -116,39 +121,56 @@ export default class CompanyContactForm extends mixins(EvanComponent) {
     // setup registration form
     this.form = (<ContactFormInterface>new EvanForm(this, {
       country: {
-        value: contactData.country || 'DE',
+        value: contactData.country,
         validate: function(vueInstance: CompanyContactForm, form: ContactFormInterface) {
           // resubmit postalCode validation
           form.postalCode.value = form.postalCode.value;
-          return this.value && this.value.length !== 0 && vueInstance.restrictCountries.indexOf(this.value) !== -1;
+          vueInstance.$emit('countryChanged', this.value);
+          return vueInstance.required.indexOf('country') === -1 ||
+            this.value && this.value.length !== 0 && vueInstance.restrictCountries.indexOf(this.value) !== -1;
         },
         uiSpecs: {
           type: 'v-select',
           attr: {
             options: this.countryOptions,
+            required: !this.stacked || this.required.indexOf('country') !== -1,
+          }
+        }
+      },
+      streetAndNumber: {
+        value: contactData.streetAndNumber || '',
+        validate: function(vueInstance: CompanyContactForm) {
+          return vueInstance.required.indexOf('streetAndNumber') === -1 || this.value.length !== 0;
+        },
+        uiSpecs: {
+          attr: {
+            required: !this.stacked || this.required.indexOf('streetAndNumber') !== -1,
+          }
+        }
+      },
+      postalCode: {
+        value: contactData.postalCode || '',
+        validate: function(vueInstance: CompanyContactForm, form: ContactFormInterface) {
+          // check postcode validity only in germany
+          return vueInstance.required.indexOf('postalCode') === -1 ||
+            (form.country.value === 'DE' ? /^\d{5}$/.test(this.value) : true);
+        },
+        uiSpecs: {
+          attr: {
+            required: () => !this.stacked || this.form.country.value === 'DE' && this.required.indexOf('postalCode') !== -1,
           }
         }
       },
       city: {
         value: contactData.city || '',
         validate: function(vueInstance: CompanyContactForm) {
-          return this.value.length !== 0;
+          return vueInstance.required.indexOf('city') === -1 || this.value.length !== 0;
         },
-      },
-      postalCode: {
-        value: contactData.postalCode || '',
-        validate: function(vueInstance: CompanyContactForm, form: ContactFormInterface) {
-          // check postcode validity only in germany
-          return form.country.value === 'DE' ?
-            /^\d{5}$/.test(this.value) :
-            true;
-        },
-      },
-      streetAndNumber: {
-        value: contactData.streetAndNumber || '',
-        validate: function(vueInstance: CompanyContactForm) {
-          return this.value.length !== 0;
-        },
+        uiSpecs: {
+          attr: {
+            required: !this.stacked || this.required.indexOf('city') !== -1,
+          }
+        }
       },
       website: {
         value: contactData.website || '',
@@ -156,6 +178,11 @@ export default class CompanyContactForm extends mixins(EvanComponent) {
           return !this.value ||
             /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:\/?#[\]@!\$&'\(\)\*\+,;=.]+$/gm.test(this.value);
         },
+        uiSpecs: {
+          attr: {
+            required: !this.stacked || this.required.indexOf('website') !== -1,
+          }
+        }
       },
     }));
   }
@@ -175,8 +202,6 @@ export default class CompanyContactForm extends mixins(EvanComponent) {
       .map(isoCode => {
         return { value: isoCode, label: (this as any).$t(`_countries.${isoCode}`), };
       })
-      .sort((countryA, countryB) => {
-          return countryA.label - countryB.label;
-      });
+      .sort((a, b) => (a.label > b.label ? 1 : (b.label > a.label ? -1 : 0)));
   }
 }

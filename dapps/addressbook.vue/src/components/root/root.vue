@@ -37,6 +37,9 @@
               <h3 class="font-weight-bold mb-0 force-oneline bg-level-3">
                 {{ '_addressbook.addressbook-desc' | translate }}
               </h3>
+              <span>
+                {{ '_addressbook.addressbook-desc-long' | translate }}
+              </span>
             </div>
             <span class="mx-auto"></span>
             <button type="button" class="btn btn-primary "
@@ -86,14 +89,24 @@
                   </thead>
                   <tbody>
                     <tr class="clickable"
-                      v-for="(contact, index) in categories[category]"
-                      @click="$refs.contactDetailModal.show(contact.accountId);"
+                      @click="contactClicked(contact)"
+                      @mouseover="contactHover = contact.accountId"
+                      @mouseleave="contactHover = null"
                       v-bind:key="index"
+                      v-for="(contact, index) in categories[category]"
                     >
                       <td class="font-weight-semibold text-primary">{{ contact.alias }}</td>
                       <td class="small text-muted">{{ contact.accountId || contact.email }}</td>
                       <td class="small text-muted">{{ contact.tags.join(', ') }}</td>
-                      <td v-bind:class="{ positionRelative: contact.loading }">
+                      <td
+                        :style="{ 'position': contact.loading || contactHover === contact.accountId ? 'relative': '' }">
+                        <evan-button
+                          @click="$refs.contactDetailModal.show(contact.accountId); $event.stopPropagation()"
+                          icon="mdi mdi-circle-edit-outline"
+                          style="position: absolute; top: 4px; right: 10px;"
+                          type="icon"
+                          v-if="!contact.loading && contactHover === contact.accountId"
+                        />
                         <div v-if="contact.loading" class="spinner-border spinner-border-sm text-secondary"></div>
                       </td>
                     </tr>
