@@ -29,6 +29,7 @@ import { PaymentService } from '../paymentService';
 import { ErrorStatus } from '../interfaces';
 import { STRIPE_ELEMENT_CONFIG } from '../stripe-config';
 import { StatusResponse } from '../StatusResponse.interface';
+import { Watch } from 'vue-property-decorator';
 
 interface PayFormInterface extends EvanForm {
   type: EvanFormControl;
@@ -106,6 +107,12 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
     payError: '',
     success: false,
   };
+
+  @Watch('contactForm.country.value')
+  onCountryChange(country) {
+    // change tax value depends on country select
+    this.taxValue = country === 'DE' && !this.contactForm.vat.value ? 19 : 0;
+  }
 
   /**
    * Watch for dispatcher updates
