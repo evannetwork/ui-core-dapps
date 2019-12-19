@@ -18,7 +18,7 @@
 */
 
 <template>
-  <div>
+  <div class="contacts">
     <div class="content pt-5">
       <div class="d-flex flex-row justify-content-between align-items-center">
         <div>

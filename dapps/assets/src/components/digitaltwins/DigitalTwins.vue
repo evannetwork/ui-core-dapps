@@ -18,7 +18,7 @@
 */
 
 <template>
-  <div>
+  <div class="digital-twins">
     <div class="row mt-5">
       <div class="col-6">
         <h1 class="h4">{{ '_assets.digitaltwins.digitaltwins-title' | translate }}</h1>
