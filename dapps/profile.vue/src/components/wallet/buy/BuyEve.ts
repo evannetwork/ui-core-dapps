@@ -111,7 +111,7 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
   @Watch('contactForm.country.value')
   onCountryChange(country) {
     // change tax value depends on country select
-    this.taxValue = country === 'DE' && !this.contactForm.vat.value ? 19 : 0;
+    this.taxValue = country === 'DE' ? 19 : 0;
   }
 
   /**
