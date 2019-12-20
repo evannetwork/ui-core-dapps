@@ -66,5 +66,5 @@ export default class DigitalTwinsComponent extends mixins(EvanComponent) {
     },
     100,
     { trailing: true }
-  )
+  );
 }

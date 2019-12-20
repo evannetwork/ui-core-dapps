@@ -111,7 +111,9 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
   @Watch('contactForm.country.value')
   onCountryChange(country) {
     // change tax value depends on country select
-    this.taxValue = country === 'DE' ? 19 : 0;
+    if (country === 'DE') {
+      this.taxValue = 19;
+    }
   }
 
   /**
@@ -409,7 +411,6 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
 
     // allow empty vat in germany
     if (country === 'DE' && !vat) {
-      this.taxValue = 19;
       this.vatCalcTimeout = null;
       return true;
     }
@@ -420,15 +421,19 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
         this.vatCalcTimeout = setTimeout(async () => {
           const { data: { result: { error, reverseCharge, tax, } } } = await axios({
             method: 'GET',
-            url: `${ agentUrl }/api/smart-agents/payment-processor/checkVat?` +
-              `vat=${ vat }&country=${ country }`
+            url: `${ agentUrl }/api/smart-agents/payment-processor/checkVat`,
+            params: {
+              vat,
+              country
+            }
           });
 
           // update taxValue
-          this.taxValue = tax || 0;
+          this.taxValue = tax !== undefined ? tax : 19;
           // needs reverse charge to be displayed?
           this.reverseCharge = reverseCharge;
           // clear timeout
+          clearTimeout(this.vatCalcTimeout);
           this.vatCalcTimeout = null;
           // resolve the error
           if (error) {
@@ -439,6 +444,7 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
         }, 500);
       });
     } else {
+      this.taxValue = 19;
       this.vatCalcTimeout = null;
     }
   }
