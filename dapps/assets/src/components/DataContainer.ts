@@ -19,8 +19,7 @@
 
 // vue imports
 import Component, { mixins } from 'vue-class-component';
-import { Prop, Watch } from 'vue-property-decorator';
-import { Route } from 'vue-router';
+import { Prop } from 'vue-property-decorator';
 
 // evan.network imports
 import { EvanComponent } from '@evan.network/ui-vue-core';
@@ -30,7 +29,7 @@ import SearchService from './SearchService';
 @Component
 export default class DataContainerComponent extends mixins(EvanComponent) {
   searchTerm = '';
-  search = new SearchService((this as any).getRuntime());
+  search = new SearchService(this.getRuntime());
   data = [];
   isLoading = false;
   page = 0;
@@ -41,21 +40,21 @@ export default class DataContainerComponent extends mixins(EvanComponent) {
     default: 'twins'
   }) type: string;
 
-  /**
-   * Watch for changes in the search query
-   */
-  @Watch('$route', { immediate: true, deep: true })
-  onRouteChange (to: Route) {
-    this.searchTerm = to.params.query;
+  mounted() {
+    this.searchTerm = this.$route.params.query || '';
 
-    this.initialQuery();
+    this.initialQuery(this.searchTerm);
   }
 
-  async initialQuery() {
+  async initialQuery(searchTerm = '', sorting = {}) {
     this.isLoading = true;
     this.page = 0;
     this.data = [];
-    const { result, total } = await this.search.query(this.type, { searchTerm: this.searchTerm });
+    this.searchTerm = searchTerm;
+
+    this.$router.push({ path: `digitaltwins/${searchTerm}` });
+
+    const { result, total } = await this.search.query(this.type, { searchTerm, ...sorting });
 
     this.total = total;
     this.data = result;
@@ -63,7 +62,7 @@ export default class DataContainerComponent extends mixins(EvanComponent) {
     this.isLoading = false;
   }
 
-  async fetchMore() {
+  async fetchMore(sorting = {}) {
     if (this.isLoading || this.data.length === this.total) {
       return;
     }
@@ -73,7 +72,8 @@ export default class DataContainerComponent extends mixins(EvanComponent) {
     const options = {
       page: this.page,
       count: this.count,
-      searchTerm: this.searchTerm
+      searchTerm: this.searchTerm,
+      ...sorting
     };
 
     const { result } = await this.search.query(this.type, options);

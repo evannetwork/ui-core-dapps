@@ -22,22 +22,22 @@
     <div class="content pt-5">
       <div class="d-flex flex-row justify-content-between align-items-center">
         <div>
-          <h1 class="h4" style="margin:0">{{ '_assets.contacts.contacts-title' | translate }}</h1>
+          <h1 class="heading">{{ '_assets.contacts.contacts-title' | translate }}</h1>
         </div>
         <div>
           <evan-button
             @click="filterByFavorites()"
             class="filter-btn ml-3"
-            type="text-secondary"
+            type="text-filter"
             icon="mdi mdi-star-outline"
             iconPosition="left"
-            :class="{ 'active': filterBy.includes('favorite') }"
+            :class="{ 'active': filterBy.includes('isFavorite') }"
             :label="$t('_assets.contacts.favorites')"
           />
           <evan-button
             @click="filterByType('users')"
             class="filter-btn ml-3"
-            type="text-secondary"
+            type="text-filter"
             icon="mdi mdi-account-outline"
             iconPosition="left"
             :class="{ 'active': filter === 'users' }"
@@ -46,25 +46,25 @@
           <evan-button
             @click="filterByType('company')"
             class="filter-btn ml-3"
-            type="text-secondary"
+            type="text-filter"
             icon="mdi mdi-domain"
             iconPosition="left"
             :class="{ 'active': filter === 'company' }"
             :label="$t('_assets.contacts.companies')"
           />
           <evan-button
-            @click="filterByType('iot-device')"
+            @click="filterByType('device')"
             class="filter-btn ml-3"
-            type="text-secondary"
+            type="text-filter"
             icon="mdi mdi-radio-tower"
             iconPosition="left"
-            :class="{ 'active': filter === 'iot-device' }"
+            :class="{ 'active': filter === 'device' }"
             :label="$t('_assets.contacts.iot-devices')"
           />
           <evan-button
             @click="resetFilter"
             class="filter-btn ml-3"
-            type="text-secondary"
+            type="text-filter"
             icon="mdi mdi-account-multiple-outline"
             iconPosition="left"
             :class="{ 'active': filter === null }"
@@ -82,29 +82,52 @@
           :filterIncludedFields="filterBy"
           :sticky-header="'80vh'"
           :show-empty="true"
+          :show-scrollbar="true"
           @row-clicked="handleRowClicked"
         >
-          
           <template
             v-slot:cell(alias)="contacts"
           >{{ contacts.item.alias ? contacts.item.alias : contacts.item.address }}</template>
           <template v-slot:cell(icon)="contacts">
             <i class="table-icon" :class="contacts.item.icon"></i>
           </template>
-          <template v-slot:cell(favorite)="contacts">
-            <i class="table-icon" :class="{'mdi mdi-star': contacts.item.favorite }"></i>
+          <template v-slot:cell(createdAt)="contacts">
+            {{ contacts.item.createdAt | moment('DD.MM.YYYY') }}
+          </template>
+          <template v-slot:cell(updatedAt)="contacts">
+            {{ contacts.item.updatedAt | moment('DD.MM.YYYY') }}
+          </template>
+          <template v-slot:cell(isFavorite)="contacts">
+            <evan-loading
+              v-if="isFavoriteLoading.loading && (isFavoriteLoading.id === contacts.item.address)"
+              classes=""
+            />
+            <evan-button
+              v-else-if="contacts.item.isFavorite === 'true'"
+              type="icon-secondary"
+              icon="mdi mdi-star"
+              :disabled="isFavoriteLoading.loading"
+              @click="removeFavorite(contacts)"
+            />
+            <evan-button
+              v-else
+              class="visible-on-row-hover"
+              type="icon-secondary"
+              icon="mdi mdi-star-outline"
+              :disabled="isFavoriteLoading.loading"
+              @click="addFavorite(contacts)"
+            />
           </template>
 
           <!-- Empty slots -->
           <template v-slot:empty>
-            <h4>{{ '_assets.contacts.contacts-empty' | translate }}</h4>
+            <span>{{ '_assets.contacts.contacts-empty' | translate }}</span>
           </template>
           <template v-slot:emptyfiltered>
-            <h4>{{ '_assets.contacts.filtered-empty' | translate }}</h4>
+            <span>{{ '_assets.contacts.filtered-empty' | translate }}</span>
           </template>
         </evan-table>
       </div>
-      <evan-loading v-if="isLoading" :classes="'mt-3'"></evan-loading>
     </div>
 
     <evan-button
@@ -113,7 +136,7 @@
       class="add-contact-btn"
       icon="mdi mdi-plus"
       @click="$refs.addContact.showPanel()"
-    ></evan-button>
+    />
 
     <add-contact ref="addContact" @contact-added="handleContactAdded" />
   </div>
@@ -127,6 +150,13 @@ export default ContactsComponent;
 <style lang="scss" scoped>
 @import '~@evan.network/ui/src/style/utils';
 
+h1.heading {
+  font-size: cssVar('h4-font-size');
+  margin: 0;
+  color: cssVar('gray-600');
+  font-weight: bold;
+}
+
 .content {
   max-width: 768px;
   margin-left: auto;
@@ -139,13 +169,9 @@ export default ContactsComponent;
   right: 60px;
 }
 
-/deep/ .filter-btn.btn {
-  color: cssVar('gray-600');
-  i.left.mdi {
-    margin-right: 0;
-  }
-  &.active {
-    border-bottom: 2px solid cssVar('primary');
+/deep/.filter-btn {
+  span {
+    font-size: 12px;
   }
 }
 

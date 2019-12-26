@@ -19,31 +19,105 @@
 
 <template>
   <div>
-    <div class="row mt-5">
-      <div class="col-6">
-        <h1 class="h4">{{ '_assets.digitaltwins.digitaltwins-title' | translate }}</h1>
+    <div class="content pt-5">
+      <div class="d-flex flex-row justify-content-between align-items-center">
+        <div class="search">
+          <label @click="isActiveSearch = true" for="searchInput">
+            <i class="mdi mdi-magnify mr-2"></i>
+            <span v-if="!isActiveSearch">{{ '_assets.digitaltwins.digitaltwins-title' | translate }}</span>
+          </label>
+          <input
+            id="searchInput"
+            ref="searchInput"
+            v-show="isActiveSearch"
+            v-model="searchTerm"
+            @blur="handleSearchBlur"
+            @keydown.enter="$event.target.blur()"
+            autocomplete="off"
+          />
+        </div>
+        <div>
+          <evan-button
+            @click="selectedFilter = 'my'"
+            class="filter-btn ml-3"
+            type="text-filter"
+            icon="mdi mdi-account-outline"
+            iconPosition="left"
+            :class="{ 'active': selectedFilter === 'my' }"
+            :label="$t('_assets.digitaltwins.my-own')"
+          />
+          <evan-button
+            @click="selectedFilter = 'favorites'"
+            class="filter-btn ml-3"
+            type="text-filter"
+            icon="mdi mdi-star-outline"
+            iconPosition="left"
+            :class="{ 'active': selectedFilter === 'favorites' }"
+            :label="$t('_assets.digitaltwins.favorites')"
+          />
+          <evan-button
+            @click="selectedFilter = 'all'"
+            class="filter-btn ml-3"
+            type="text-filter"
+            icon="mdi mdi-cube-outline"
+            iconPosition="left"
+            :class="{ 'active': selectedFilter === 'all' }"
+            :label="$t('_assets.digitaltwins.all')"
+          />
+        </div>
       </div>
-      <div class="col-6 text-right">
-        <evan-button :type="'text'">{{'_assets.search.my-own' | translate }}</evan-button>
-        <evan-button :type="'text'">{{'_assets.digitaltwins.favorites' | translate }}</evan-button>
-        <evan-button :type="'text'">{{'_assets.digitaltwins.all' | translate }}</evan-button>
+
+      <div class="d-flex flex-row mt-3">
+        <evan-table
+          :hover="true"
+          :items="data"
+          :fields="columns"
+          :show-scrollbar="true"
+          :sticky-header="'80vh'"
+          :sortBy="sortBy"
+          :sort-direction="reverse ? 'desc' : 'asc'"
+          no-local-sorting="true"
+          @sort-changed="sortHandler"
+          @scroll.native="scrollHandler"
+        >
+          <template v-slot:cell(icon)="data">
+            <i class="table-icon mdi mdi-cube-outline" />
+          </template>
+          <template v-slot:cell(updated)="data">{{ data.item.updated | moment('DD.MM.YYYY') }}</template>
+          <template v-slot:cell(created)="data">{{ data.item.updated | moment('DD.MM.YYYY') }}</template>
+          <template v-slot:cell(isFavorite)="twin">
+            <evan-loading v-if="isFavoriteLoading(twin)" classes />
+            <evan-button
+              v-else-if="isFavorite(twin)"
+              type="icon-secondary"
+              icon="mdi mdi-star"
+              :disabled="isAnyLoading"
+              @click="removeFavorite(twin)"
+            />
+            <evan-button
+              v-else
+              class="visible-on-row-hover"
+              type="icon-secondary"
+              icon="mdi mdi-star-outline"
+              :disabled="isAnyLoading"
+              @click="addFavorite(twin)"
+            />
+          </template>
+        </evan-table>
       </div>
     </div>
-    <b-table
-      class="evan-table"
-      hover
-      :items="data"
-      :fields="columns"
-      :tbody-tr-class="'evan-table-row'"
-      sticky-header="80vh"
-      @scroll.native="scrollHandler"
-    >
-      <template v-slot:cell(icon)="data">
-        <i class="table-icon" :class="data.item.icon"></i>
-      </template>
-      <!-- <template v-slot:name="name">{{name.first}} {{name.last}}</template> -->
-    </b-table>
-    <evan-loading v-if="isLoading" :classes="'mt-3'"></evan-loading>
+
+    <evan-loading v-if="isLoading" classes />
+
+    <evan-button
+      :type="'icon-primary'"
+      size="lg"
+      class="add-twin-btn"
+      icon="mdi mdi-plus"
+      @click="$refs.addDigitaTwin.showPanel()"
+    />
+
+    <add-digital-twin ref="addDigitaTwin" />
   </div>
 </template>
 
@@ -53,29 +127,5 @@ export default DigitalTwinsComponent;
 </script>
 
 <style lang="scss" scoped>
-@import'~@evan.network/ui/src/style/utils';
-/deep/ .evan-table {
-  margin: 0;
-  table {
-    border-spacing: 0 4px;
-    border-collapse: separate;
-  }
-  table.table.b-table > thead > tr > th {
-    background-color: cssVar('bg-level-3');
-    border: none;
-    color: cssVar('gray-600');
-  }
-  table.table.b-table > tbody > tr > td {
-    vertical-align: middle;
-    border: none;
-  }
-  tr.evan-table-row {
-    height: 64px;
-    background-color: white;
-  }
-  .table-icon {
-    font-size: 1.75em;
-    margin-left: 0.25em;
-  }
-}
+@import './DigitalTwins.scss';
 </style>
