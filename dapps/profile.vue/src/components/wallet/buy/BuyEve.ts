@@ -52,6 +52,8 @@ interface OptionInterface {
   label: string;
 }
 
+const GERMAN_VAT = 19;
+
 @Component({})
 export default class BuyEveComponent extends mixins(EvanComponent) {
   /**
@@ -112,7 +114,7 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
   onCountryChange(country) {
     // change tax value depends on country select
     if (country === 'DE') {
-      this.taxValue = 19;
+      this.taxValue = GERMAN_VAT;
     }
   }
 
@@ -222,7 +224,7 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
     }));
 
     // setup contact formular and pass profile data
-    const data = (this as any).$store.state.profileDApp.data;
+    const data = this.getProfileData();
     const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     this.contactForm = (<ContactFormInterface>new EvanForm(this, {
       name: {
@@ -329,6 +331,22 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
     this.contactForm.vat.value = this.contactForm.vat.value;
   }
 
+  private getProfileData() {
+    const defaultProfile = {
+      accountDetails: {
+        accountName: ''
+      },
+      contact: {
+        streetAndNumber: '',
+        postalCode: '',
+        city: '',
+        country: 'DE'
+      }
+    };
+
+    return Object.assign(defaultProfile, (this as any).$store.state.profileDApp.data);
+  }
+
   /**
    * Renders the stripe element for the current payment method
    *
@@ -429,7 +447,7 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
           });
 
           // update taxValue
-          this.taxValue = tax !== undefined ? tax : 19;
+          this.taxValue = tax !== undefined ? tax : GERMAN_VAT;
           // needs reverse charge to be displayed?
           this.reverseCharge = reverseCharge;
           // clear timeout
@@ -444,7 +462,7 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
         }, 500);
       });
     } else {
-      this.taxValue = 19;
+      this.taxValue = GERMAN_VAT;
       this.vatCalcTimeout = null;
     }
   }
