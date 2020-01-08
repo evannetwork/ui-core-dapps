@@ -1,5 +1,7 @@
 # @evan.network/evan-dapps
 
+*This project is archived / readonly and was migrated to the [ui-dapps](https://github.com/evannetwork/ui-dapps) project.*
+
 ## Install
 - you very likely will need `nvm` installed
 - you definitely need `lerna` and `gulp` installed
