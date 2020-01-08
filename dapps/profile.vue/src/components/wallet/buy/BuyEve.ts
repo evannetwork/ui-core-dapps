@@ -28,6 +28,8 @@ import axios from 'axios';
 import { PaymentService } from '../paymentService';
 import { ErrorStatus } from '../interfaces';
 import { STRIPE_ELEMENT_CONFIG } from '../stripe-config';
+import { StatusResponse } from '../StatusResponse.interface';
+import { Watch } from 'vue-property-decorator';
 
 interface PayFormInterface extends EvanForm {
   type: EvanFormControl;
@@ -49,6 +51,8 @@ interface OptionInterface {
   value: string;
   label: string;
 }
+
+const GERMAN_VAT = 19;
 
 @Component({})
 export default class BuyEveComponent extends mixins(EvanComponent) {
@@ -105,6 +109,14 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
     payError: '',
     success: false,
   };
+
+  @Watch('contactForm.country.value')
+  onCountryChange(country) {
+    // change tax value depends on country select
+    if (country === 'DE') {
+      this.taxValue = GERMAN_VAT;
+    }
+  }
 
   /**
    * Watch for dispatcher updates
@@ -164,7 +176,7 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
   setupForms() {
     // setup pay formular
     const $t = (this as any).$t;
-    this.payForm = (<PayFormInterface>new EvanForm(this, { 
+    this.payForm = (<PayFormInterface>new EvanForm(this, {
       amount: {
         value: 10,
         validate: function(vueInstance: BuyEveComponent) {
@@ -212,7 +224,7 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
     }));
 
     // setup contact formular and pass profile data
-    const data = (this as any).$store.state.profileDApp.data;
+    const data = this.getProfileData();
     const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     this.contactForm = (<ContactFormInterface>new EvanForm(this, {
       name: {
@@ -319,6 +331,22 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
     this.contactForm.vat.value = this.contactForm.vat.value;
   }
 
+  private getProfileData() {
+    const defaultProfile = {
+      accountDetails: {
+        accountName: ''
+      },
+      contact: {
+        streetAndNumber: '',
+        postalCode: '',
+        city: '',
+        country: 'DE'
+      }
+    };
+
+    return Object.assign(defaultProfile, (this as any).$store.state.profileDApp.data);
+  }
+
   /**
    * Renders the stripe element for the current payment method
    *
@@ -377,11 +405,12 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
       { type: this.payForm.type.value === 'iban' ? 'sepa_debit' : 'card' },
     );
 
-    if (result.status === 'error') {
-      this.stripe.payError = (result as ErrorStatus).code;
+    if (this.isErrorStatus(result)) {
+      this.stripe.payError = result.code;
     } else {
       this.stripe.payError = '';
       this.stripe.success = true;
+
       // send event, so e.g. the transactions overview can reload
       window.dispatchEvent(new CustomEvent('evan-credit-recharge'));
     }
@@ -400,7 +429,6 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
 
     // allow empty vat in germany
     if (country === 'DE' && !vat) {
-      this.taxValue = 19;
       this.vatCalcTimeout = null;
       return true;
     }
@@ -411,15 +439,19 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
         this.vatCalcTimeout = setTimeout(async () => {
           const { data: { result: { error, reverseCharge, tax, } } } = await axios({
             method: 'GET',
-            url: `${ agentUrl }/api/smart-agents/payment-processor/checkVat?` + 
-              `vat=${ vat }&country=${ country }`
+            url: `${ agentUrl }/api/smart-agents/payment-processor/checkVat`,
+            params: {
+              vat,
+              country
+            }
           });
 
           // update taxValue
-          this.taxValue = tax || 0;
+          this.taxValue = tax !== undefined ? tax : GERMAN_VAT;
           // needs reverse charge to be displayed?
           this.reverseCharge = reverseCharge;
           // clear timeout
+          clearTimeout(this.vatCalcTimeout);
           this.vatCalcTimeout = null;
           // resolve the error
           if (error) {
@@ -430,6 +462,7 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
         }, 500);
       });
     } else {
+      this.taxValue = GERMAN_VAT;
       this.vatCalcTimeout = null;
     }
   }
@@ -439,7 +472,7 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
    */
   handleWindowResize() {
     this.windowWidth = window.innerWidth;
-    if (this.windowWidth >= 1200) {
+    if (this.windowWidth >= 1400) {
       (<any>this).$store.state.uiState.swipePanel = 'sharing';
     }
   }
@@ -450,5 +483,14 @@ export default class BuyEveComponent extends mixins(EvanComponent) {
   removeStripeError() {
     this.stripe.payError = '';
     this.buying = false;
+  }
+
+  /**
+   * check if object is of type ErrorStatus or StatusResponse
+   *
+   * @param {ErrorStatus | StatusResponse} object
+   */
+  isErrorStatus(object: ErrorStatus | StatusResponse): object is ErrorStatus {
+    return (object as ErrorStatus).code !== undefined;
   }
 }
